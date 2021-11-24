@@ -26,7 +26,7 @@
 
 ![All PyGame created and published games](https://i.ibb.co/DzSK90G/Snimka-zaslona-2021-11-20-042044.png)
 
-# Gym
+## Gym
 *Gym is a toolkit for developing and comparing reinforcement learning algorithms. It makes no assumptions about the structure of your agent, and is compatible with any numerical computation library, such as TensorFlow or Theano.*
 
 *The gym library is a collection of test problems — **environments** — that you can use to work out your reinforcement learning algorithms. These environments have a shared interface, allowing you to write general algorithms.*
@@ -67,6 +67,61 @@ env.close()
 
 **Tutorials and useful links**
 - [Notable Related Libraries](https://github.com/openai/gym#notable-related-libraries)
+
+
+## Gym Retro
+*Gym Retro lets you turn classic video games into [Gym](https://gym.openai.com/) environments for reinforcement learning and comes with integrations for ~1000 games. It uses various emulators that support the [Libretro API](https://www.libretro.com/index.php/api/), making it fairly easy to add new emulators.*
+
+[>> GitHub Repository <<](https://github.com/openai/retro)
+[>> Documentation <<](https://retro.readthedocs.io/en/latest/)  
+
+**Setup:**
+`pip install gym-retro`
+
+*Minimum example of getting something running* (same as gym) *:*
+```
+import retro
+
+def main():
+    env = retro.make(game='Airstriker-Genesis')
+    obs = env.reset()
+    while True:
+        observation, reward, done, info = env.step(env.action_space.sample())
+        env.render()
+        if done:
+            obs = env.reset()
+    env.close()
+
+if __name__ == "__main__":
+    main()
+```
+`observation (numpy.array)` `[IMAGE, RAM]` &rarr; current state; RGB values of game pixels / RAM values ?!?! array of `65536` values  
+`reward (float)` &rarr; the reward gained by the last performed action/during the previous step   
+`done (boolean)` &rarr; flag that turns to `true` when the environment reaches an end point; no more actions can be performed and the environment needs to be reset  
+ `info (dict)` &rarr; data for additional or debugging purposes; the data is not visible to the agent  
+
+**PROS:**
+- bunch of `Atari`, `Sega`, `NEC` & `Nintendo` games
+- multiplayer environments
+- replay files
+- gameplay record
+- playback
+- render to video
+
+**CONS:**
+- observation array is somehow useful ?!?!
+
+**The Integration UI:** *?! setup &rarr; how ?!*    
+![Retro Gym Integration UI](https://user-images.githubusercontent.com/31688036/60402086-ca19ee80-9b8a-11e9-9eb0-662c9b4466dd.png)
+
+
+**Tutorials and useful links:**
+- [Gym Retro Template - *GitHub*](https://github.com/floydhub/gym-retro-template)
+- [Integration UI google storage isn't working?](https://github.com/openai/retro/issues/227)
+- [Retro Gym with Baselines](https://medium.com/aureliantactics/retro-gym-with-baselines-4-basic-usage-tips-1842d9aeff5)
+- [Setup an openAI training environment with gym-retro and NEAT in Windows 7](https://youtu.be/j3eHWG2CtqU)
+- [Ultimate Guide to Reinforcement Learning Part 1 — Creating a Game](https://towardsdatascience.com/ultimate-guide-for-reinforced-learning-part-1-creating-a-game-956f1f2b0a91)
+- 
 
 ---
 - https://stable-baselines.readthedocs.io/en/master/
