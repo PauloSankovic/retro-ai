@@ -72,7 +72,7 @@ env.close()
 ## Gym Retro
 *Gym Retro lets you turn classic video games into [Gym](https://gym.openai.com/) environments for reinforcement learning and comes with integrations for ~1000 games. It uses various emulators that support the [Libretro API](https://www.libretro.com/index.php/api/), making it fairly easy to add new emulators.*
 
-[>> GitHub Repository <<](https://github.com/openai/retro)
+[>> GitHub Repository <<](https://github.com/openai/retro)  
 [>> Documentation <<](https://retro.readthedocs.io/en/latest/)  
 
 **Setup:**
@@ -121,7 +121,6 @@ if __name__ == "__main__":
 - [Retro Gym with Baselines](https://medium.com/aureliantactics/retro-gym-with-baselines-4-basic-usage-tips-1842d9aeff5)
 - [Setup an openAI training environment with gym-retro and NEAT in Windows 7](https://youtu.be/j3eHWG2CtqU)
 - [Ultimate Guide to Reinforcement Learning Part 1 — Creating a Game](https://towardsdatascience.com/ultimate-guide-for-reinforced-learning-part-1-creating-a-game-956f1f2b0a91)
-- 
 
 ---
 - https://stable-baselines.readthedocs.io/en/master/
