@@ -70,7 +70,8 @@ env.close()
 
 
 ## Gym Retro
-*Gym Retro lets you turn classic video games into [Gym](https://gym.openai.com/) environments for reinforcement learning and comes with integrations for ~1000 games. It uses various emulators that support the [Libretro API](https://www.libretro.com/index.php/api/), making it fairly easy to add new emulators.*
+*OpenAi Gym extension.   
+Gym Retro lets you turn classic video games into [Gym](https://gym.openai.com/) environments for reinforcement learning and comes with integrations for ~1000 games. It uses various emulators that support the [Libretro API](https://www.libretro.com/index.php/api/), making it fairly easy to add new emulators.*
 
 [>> GitHub Repository <<](https://github.com/openai/retro)  
 [>> Documentation <<](https://retro.readthedocs.io/en/latest/)  
@@ -101,6 +102,7 @@ if __name__ == "__main__":
  `info (dict)` &rarr; data for additional or debugging purposes; the data is not visible to the agent  
 
 **PROS:**
+- decent documentation and stack-overflow support (for `gym` in general)
 - bunch of `Atari`, `Sega`, `NEC` & `Nintendo` games
 - multiplayer environments
 - replay files
@@ -121,6 +123,9 @@ if __name__ == "__main__":
 - [Retro Gym with Baselines](https://medium.com/aureliantactics/retro-gym-with-baselines-4-basic-usage-tips-1842d9aeff5)
 - [Setup an openAI training environment with gym-retro and NEAT in Windows 7](https://youtu.be/j3eHWG2CtqU)
 - [Ultimate Guide to Reinforcement Learning Part 1 — Creating a Game](https://towardsdatascience.com/ultimate-guide-for-reinforced-learning-part-1-creating-a-game-956f1f2b0a91)
+- [Retro Contest](https://openai.com/blog/retro-contest/)
+- [Player Games in OpenAI Retro](https://ai.stackexchange.com/questions/11174/2-player-games-in-openai-retro)
+- [Is it possible to modify OpenAI environments?](https://stackoverflow.com/questions/53194107/is-it-possible-to-modify-openai-environments)
 
 ---
 - https://stable-baselines.readthedocs.io/en/master/
