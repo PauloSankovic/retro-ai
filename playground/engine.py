@@ -4,17 +4,15 @@ import time
 import gym
 from gym.core import Env
 
-logger = logging.getLogger(__name__)
-
 
 def instantiate(environment_id: str, **kwargs) -> Env:
-    init_logging(environment_id)
+    # init_logging(environment_id)
     return gym.make(environment_id, **kwargs)
 
 
 def run(env: Env, agent, timeout: float = 0) -> float:
     state = env.reset()
-    logger.info('Initial state: %s', state)
+    # logger.info('Initial state: %s', state)
 
     total_reward = 0.0
     done = False
@@ -23,13 +21,13 @@ def run(env: Env, agent, timeout: float = 0) -> float:
         action = agent.get_action(state)
         state, reward, done, info = env.step(action)
 
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('Agent action: %s; Current state: %s; Reward: %s; Done: %s', action, state, reward, done)
+        # if logger.isEnabledFor(logging.DEBUG):
+        #     logger.debug('Agent action: %s; Current state: %s; Reward: %s; Done: %s', action, state, reward, done)
 
         total_reward += reward
         env.render()
 
-    logger.info('Total reward: %f', total_reward)
+    # logger.info('Total reward: %f', total_reward)
     return total_reward
 
 
