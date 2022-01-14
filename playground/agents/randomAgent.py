@@ -1,6 +1,20 @@
-class RandomAgent(object):
-    def __init__(self, env):
-        self.action_space = env.action_space
+import numpy as np
+
+from gym.core import Env
+from gym.spaces.discrete import Discrete
+
+
+class RandomAgent:
+    def __init__(self, env: Env):
+        self.is_discrete = type(env.action_space) == Discrete
+
+        self.action_size = env.action_space.n
+        if not self.is_discrete:
+            self.action_high = env.action_space.high
+            self.action_low = env.action_space.low
 
     def get_action(self, state):
-        return self.action_space.np_random.randint(self.action_space.n)
+        if self.is_discrete:
+            return np.random.choice(self.action_size)
+        else:
+            return np.random.uniform(self.action_low, self.action_high, self.action_size)

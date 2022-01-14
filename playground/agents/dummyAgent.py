@@ -1,4 +1,4 @@
-class DummyAgent(object):
+class DummyAgent:
     def __init__(self, env):
         self.n = env.action_space.n
 
