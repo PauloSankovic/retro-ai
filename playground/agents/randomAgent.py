@@ -8,13 +8,15 @@ class RandomAgent:
     def __init__(self, env: Env):
         self.is_discrete = type(env.action_space) == Discrete
 
-        self.action_size = env.action_space.n
+        if self.is_discrete:
+            self.action_size = env.action_space.n
         if not self.is_discrete:
             self.action_high = env.action_space.high
             self.action_low = env.action_space.low
+            self.action_shape = env.action_space.shape
 
     def get_action(self, state):
         if self.is_discrete:
             return np.random.choice(self.action_size)
         else:
-            return np.random.uniform(self.action_low, self.action_high, self.action_size)
+            return np.random.uniform(self.action_low, self.action_high, self.action_shape)
