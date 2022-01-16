@@ -1,5 +1,8 @@
 # gym/envs/__init__.py
 
+# Box2D
+CAR_RACING = 'CarRacing-v0'
+
 # Classic Control
 CART_POLE = 'CartPole-v1'
 MOUNTAIN_CAR = 'MountainCar-v0'
