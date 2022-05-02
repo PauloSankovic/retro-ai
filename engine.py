@@ -1,4 +1,3 @@
-import logging
 import time
 
 import gym
@@ -23,7 +22,3 @@ def run(env: Env, agent, timeout: float = 0) -> float:
         env.render()
 
     return total_reward
-
-
-def init_logging(environment_id: str):
-    logging.basicConfig(format=f'%(asctime)s - %{environment_id} - %(message)s', datefmt='%H:%M:%S')
