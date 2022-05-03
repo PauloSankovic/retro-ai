@@ -22,7 +22,7 @@ class BasicQAgent(RandomAgent):
         action_random = super().get_action(state)
         return action_random if np.random.random() < self.eps else action_greedy
 
-    def train(self, state, action, next_state, reward, done):
+    def train(self, state, action, next_state, reward, info, done):
         q_next = np.zeros(self.action_size) if done else self.q_table[next_state]
         q_target = reward + self.discount_rate * np.max(q_next)
 
