@@ -14,11 +14,10 @@ class BasicQAgent(RandomAgent):
         self.discount_rate = kvargs.get('discount_rate', 1)
         self.learning_rate = kvargs.get('learning_rate', 1)
 
-        self.train_summary = {
-            'eps': [],
-            'discount_rates': [],
-            'learning_rates': []
-        }
+        self.params += [('eps', 'Epsilon'), ('discount_rates', 'Discount rates'), ('learning_rates', 'Learning rates')]
+        self.train_summary['eps'] = []
+        self.train_summary['discount_rates'] = []
+        self.train_summary['learning_rates'] = []
 
     def snapshot(self, episode: int, reward: float, cum_reward: float) -> None:
         super().snapshot(episode, reward, cum_reward)

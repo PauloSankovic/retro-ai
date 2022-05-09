@@ -4,6 +4,8 @@ import time
 import gym
 from gym.core import Env
 
+from IPython.display import clear_output
+
 logger = logging.getLogger(__name__)
 
 
@@ -12,17 +14,27 @@ def instantiate(environment_id: str, **kwargs) -> Env:
     return gym.make(environment_id, **kwargs)
 
 
-def run(env: Env, agent, stop_callback, **kwargs):
+def run(env: Env, agent, stop_callback, verbose: bool = False, **kwargs):
+    _clear_output = kwargs.get('clear_output', False)
+
     cumulative_reward = 0
-    episode = 1
+    episode = 0
     while True:
-        reward = run_episode(env, agent, render=True)
+        if _clear_output:
+            clear_output(wait=True)
+
+        reward = run_episode(env, agent, kwargs.get('train', False), kwargs.get('render', True),
+                             kwargs.get('timeout', 0))
         cumulative_reward += reward
-        logger.info(f"Episode {episode} -> Reward {reward}")
+
+        if verbose and (episode % 10 == 0 or episode == 999):
+            agent.snapshot(episode, reward, cumulative_reward)
+            logger.info(f"Episode {episode} -> Reward {reward}")
 
         episode += 1
-        if stop_callback:
+        if episode >= 1000:
             break
+    logger.info("Terminating")
 
 
 def run_episode(env: Env, agent, train: bool = False, render: bool = True, timeout: float = 0) -> float:

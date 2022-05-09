@@ -16,6 +16,7 @@ class RandomAgent:
             self.action_low = env.action_space.low
             self.action_shape = env.action_space.shape
 
+        self.params = [('episodes', 'Episodes'), ('rewards', 'Rewards'), ('cum_rewards', 'Cumulative rewards')]
         self.train_summary = {
             'episodes': [],
             'rewards': [],

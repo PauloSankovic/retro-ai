@@ -5,7 +5,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-DIR = Path(__file__).parent
+DIR = Path(__file__).parent.parent
 
 
 def create_path(base_dir: str, model_name: str, parts: dict) -> Path:
