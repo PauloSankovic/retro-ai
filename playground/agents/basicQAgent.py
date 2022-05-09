@@ -1,7 +1,7 @@
 import numpy as np
 from gym.core import Env
 
-from randomAgent import RandomAgent
+from .randomAgent import RandomAgent
 
 
 class BasicQAgent(RandomAgent):
@@ -13,6 +13,18 @@ class BasicQAgent(RandomAgent):
         self.eps = kvargs.get('eps', 1)
         self.discount_rate = kvargs.get('discount_rate', 1)
         self.learning_rate = kvargs.get('learning_rate', 1)
+
+        self.train_summary = {
+            'eps': [],
+            'discount_rates': [],
+            'learning_rates': []
+        }
+
+    def snapshot(self, episode: int, reward: float, cum_reward: float) -> None:
+        super().snapshot(episode, reward, cum_reward)
+        self.train_summary['eps'].append(self.eps)
+        self.train_summary['discount_rates'].append(self.discount_rate)
+        self.train_summary['learning_rates'].append(self.learning_rate)
 
     def get_action(self, state, train: bool = False):
         q_state = self.q_table[state]
