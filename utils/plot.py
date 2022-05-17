@@ -15,7 +15,7 @@ def plot_model(model):
     x_param_label = model.params[0]
     for i in range(1, len(model.params)):
         y_param_label = model.params[i]
-        plot_model_param(model, x_param_label, y_param_label)
+        plot_model_param(model, x_param_label, y_param_label, f'{x_param_label[1]}/{y_param_label[1]}')
 
 
 def plot_model_param(model, x_param_label: tuple, y_param_label: tuple, title: str = ""):
@@ -34,7 +34,7 @@ def prepare_plot(x, y, title: str, xlabel: str, ylabel: str):
 
 
 def plot_and_save(x, y, title: str, xlabel: str, ylabel: str, base_dir: str = "figures"):
-    path = DIR / base_dir / title.lower().replace(" ", "_")
+    path = DIR / base_dir / title.lower().replace(" ", "_").replace("/", "_")
     prepare_plot(x, y, title, xlabel, ylabel)
     plt.savefig(f'{path}.png')
     plt.show()
