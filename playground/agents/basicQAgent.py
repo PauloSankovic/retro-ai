@@ -14,17 +14,6 @@ class BasicQAgent(RandomAgent):
         self.discount_rate = kvargs.get('discount_rate', 1)
         self.learning_rate = kvargs.get('learning_rate', 1)
 
-        self.params += [('eps', 'Epsilon'), ('discount_rates', 'Discount rates'), ('learning_rates', 'Learning rates')]
-        self.train_summary['eps'] = []
-        self.train_summary['discount_rates'] = []
-        self.train_summary['learning_rates'] = []
-
-    def snapshot(self, episode: int, reward: float, cum_reward: float) -> None:
-        super().snapshot(episode, reward, cum_reward)
-        self.train_summary['eps'].append(self.eps)
-        self.train_summary['discount_rates'].append(self.discount_rate)
-        self.train_summary['learning_rates'].append(self.learning_rate)
-
     def get_action(self, state, train: bool = False):
         q_state = self.q_table[state]
         action_greedy = np.argmax(q_state)

@@ -16,23 +16,11 @@ class RandomAgent:
             self.action_low = env.action_space.low
             self.action_shape = env.action_space.shape
 
-        self.params = [('episodes', 'Episodes'), ('rewards', 'Rewards'), ('cum_rewards', 'Cumulative rewards')]
-        self.train_summary = {
-            'episodes': [],
-            'rewards': [],
-            "cum_rewards": []
-        }
-
-    def snapshot(self, episode: int, reward: float, cum_reward: float) -> None:
-        self.train_summary['episodes'].append(episode)
-        self.train_summary['rewards'].append(reward)
-        self.train_summary['cum_rewards'].append(cum_reward)
-
     def get_action(self, state, train: bool = False):
         if self.is_discrete:
             return np.random.choice(self.action_size)
         else:
             return np.random.uniform(self.action_low, self.action_high, self.action_shape)
 
-    def train(self, state, action, next_state, reward, done):
+    def train(self, state, action, next_state, reward, info, done):
         raise NotImplementedError()

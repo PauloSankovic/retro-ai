@@ -28,7 +28,6 @@ def run(env: Env, agent, stop_callback, verbose: bool = False, **kwargs):
         cumulative_reward += reward
 
         if verbose and (episode % 10 == 0 or episode == 999):
-            agent.snapshot(episode, reward, cumulative_reward)
             logger.info(f"Episode {episode} -> Reward {reward}")
 
         episode += 1
