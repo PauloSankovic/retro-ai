@@ -30,7 +30,7 @@ def run(env: Env, agent, optimizer=None, stop_callback=None, verbose: bool = Fal
             agent.evaluate(optimizer)
 
         if verbose and episode % 10 == 0:
-            logger.info(f"Episode {episode} -> Reward {reward} (running reward: {running_reward})")
+            logger.info(f"Episode {episode} -> Reward {reward} (running reward: {running_reward:.3f})")
 
         episode += 1
         if running_reward > env.spec.reward_threshold:
