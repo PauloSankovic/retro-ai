@@ -1,7 +1,4 @@
 import gym
-from gym.utils import play
+from gym.utils.play import play
 
-import envs
-
-env = gym.make(envs.CAR_RACING)
-play.play(env, zoom=3)
+play(gym.make('ALE/Breakout-v5'), zoom=2)
