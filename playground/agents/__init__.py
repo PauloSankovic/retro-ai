@@ -3,4 +3,5 @@ from .basicQAgent import BasicQAgent
 from .dummyAgent import DummyAgent
 from .randomAgent import RandomAgent
 
+from .dqnAgent import DeepQNetworkAgent, ReplayMemory
 from .acAgent import ActorCriticAgent
