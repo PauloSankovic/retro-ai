@@ -1,10 +1,10 @@
-import gym
 import numpy as np
 import torch
 import itertools
+
+from playground.agents.ddqnAgent import DoubleDeepQNetworkAgent
 from playground.networks import cnn, CnnStructure
 from baselines_wrappers import DummyVecEnv, Monitor
-from playground.agents import DeepQNetworkAgent
 from pytorch_wrappers import make_atari_deepmind, BatchedPytorchFrameStack, PytorchLazyFrames
 import time
 
@@ -24,11 +24,11 @@ cnn_layers = [
     CnnStructure(in_channels=32, out_channels=64, kernel_size=4, stride=2),
     CnnStructure(in_channels=64, out_channels=64, kernel_size=3, stride=1)
 ]
-net = cnn(cnn_layers, [512], env.action_space.n)
+net = cnn(env.observation_space, cnn_layers, [512], env.action_space.n)
 
-agent = DeepQNetworkAgent(env, net)
+agent = DoubleDeepQNetworkAgent(env, net)
 
-state = load_state_dict('DeepQNetworkAgent', env='breakout', step='1060000')
+state = load_state_dict('DoubleDeepQNetworkAgent', env='breakout', step='110000', v='2')
 agent.load_state_dict(state)
 
 obs = env.reset()
