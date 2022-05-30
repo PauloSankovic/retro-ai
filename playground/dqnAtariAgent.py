@@ -35,92 +35,93 @@ LOG_DIR = '../summary/breakout/dqn-v2'
 # logging interval
 LOG_INTERVAL = 1_000
 
-replay_memory = ReplayMemory(BUFFER_SIZE)
-summary_writer = SummaryWriter(LOG_DIR)
+if __name__ == '__main__':
+    replay_memory = ReplayMemory(BUFFER_SIZE)
+    summary_writer = SummaryWriter(LOG_DIR)
 
-env = lambda: Monitor(make_atari_deepmind('ALE/Breakout-v5', scale_values=True), allow_early_resets=True)
+    env = lambda: Monitor(make_atari_deepmind('ALE/Breakout-v5', scale_values=True), allow_early_resets=True)
 
-# switched to the batched env ->
-# everything returned from batched environment has batched dimension
-# these envs both reset the env when it's done for us
-env = DummyVecEnv([env for _ in range(NUM_ENVS)])
-# env = SubprocVecEnv([env for _ in range(NUM_ENVS)])
+    # switched to the batched env ->
+    # everything returned from batched environment has batched dimension
+    # these envs both reset the env when it's done for us
+    # env = DummyVecEnv([env for _ in range(NUM_ENVS)])
+    env = SubprocVecEnv([env for _ in range(NUM_ENVS)])
 
-env = BatchedPytorchFrameStack(env, k=NUM_ENVS)
+    env = BatchedPytorchFrameStack(env, k=NUM_ENVS)
 
-cnn_layers = [
-    CnnStructure(in_channels=env.observation_space.shape[0], out_channels=32, kernel_size=8, stride=4),
-    CnnStructure(in_channels=32, out_channels=64, kernel_size=4, stride=2),
-    CnnStructure(in_channels=64, out_channels=64, kernel_size=3, stride=1)
-]
-net = cnn(env.observation_space, cnn_layers, [512], env.action_space.n)
+    cnn_layers = [
+        CnnStructure(in_channels=env.observation_space.shape[0], out_channels=32, kernel_size=8, stride=4),
+        CnnStructure(in_channels=32, out_channels=64, kernel_size=4, stride=2),
+        CnnStructure(in_channels=64, out_channels=64, kernel_size=3, stride=1)
+    ]
+    net = cnn(env.observation_space, cnn_layers, [512], env.action_space.n)
 
-online_net = DeepQNetworkAgent(env, net)
-target_net = DeepQNetworkAgent(env, net)
+    online_net = DeepQNetworkAgent(env, net)
+    target_net = DeepQNetworkAgent(env, net)
 
-target_net.load_state_dict(online_net.state_dict())
+    target_net.load_state_dict(online_net.state_dict())
 
-optimizer = optim.Adam(online_net.parameters(), lr=ALPHA)
+    optimizer = optim.Adam(online_net.parameters(), lr=ALPHA)
 
-states = env.reset()
-for _ in range(MIN_REPLAY_SIZE):
-    actions = [env.action_space.sample() for _ in range(NUM_ENVS)]
-    next_states, rewards, dones, _ = env.step(actions)
-    for state, action, done, next_state, reward in zip(states, actions, dones, next_states, rewards):
-        replay_memory.push(state, action, done, next_state, reward)
-    states = next_states
+    states = env.reset()
+    for _ in range(MIN_REPLAY_SIZE):
+        actions = [env.action_space.sample() for _ in range(NUM_ENVS)]
+        next_states, rewards, dones, _ = env.step(actions)
+        for state, action, done, next_state, reward in zip(states, actions, dones, next_states, rewards):
+            replay_memory.push(state, action, done, next_state, reward)
+        states = next_states
 
-# Main training loop
-states = env.reset()
+    # Main training loop
+    states = env.reset()
 
-ep_infos = []
-episode_count = 0
-for step in itertools.count():
-    epsilon = np.interp(step * NUM_ENVS, [0, EPSILON_DECAY], [EPSILON_START, EPSILON_END])
+    ep_infos = []
+    episode_count = 0
+    for step in itertools.count():
+        epsilon = np.interp(step * NUM_ENVS, [0, EPSILON_DECAY], [EPSILON_START, EPSILON_END])
 
-    if isinstance(states[0], PytorchLazyFrames):
-        act_states = np.stack([s.get_frames() for s in states])
-        actions = online_net.get_actions(act_states, epsilon)
-    else:
-        actions = online_net.get_actions(states, epsilon)
+        if isinstance(states[0], PytorchLazyFrames):
+            act_states = np.stack([s.get_frames() for s in states])
+            actions = online_net.get_actions(act_states, epsilon)
+        else:
+            actions = online_net.get_actions(states, epsilon)
 
-    next_states, rewards, dones, infos = env.step(actions)
-    for state, action, done, next_state, reward, info in zip(states, actions, dones, next_states, rewards, infos):
-        replay_memory.push(state, action, done, next_state, reward)
+        next_states, rewards, dones, infos = env.step(actions)
+        for state, action, done, next_state, reward, info in zip(states, actions, dones, next_states, rewards, infos):
+            replay_memory.push(state, action, done, next_state, reward)
 
-        if done:
-            ep_infos.append(info['episode'])
-            episode_count += 1
+            if done:
+                ep_infos.append(info['episode'])
+                episode_count += 1
 
-    states = next_states
+        states = next_states
 
-    # Start Gradient Step
-    transitions = replay_memory.sample(BATCH_SIZE)
-    loss = online_net.loss(transitions, target_net, GAMMA)
+        # Start Gradient Step
+        transitions = replay_memory.sample(BATCH_SIZE)
+        loss = online_net.loss(transitions, target_net, GAMMA)
 
-    # Gradient Decent
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
+        # Gradient Decent
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
 
-    if step % TARGET_UPDATE_FREQ == 0:
-        target_net.load_state_dict(online_net.state_dict())
+        if step % TARGET_UPDATE_FREQ == 0:
+            target_net.load_state_dict(online_net.state_dict())
 
-    # Logging
-    if step % LOG_INTERVAL == 0:
-        rew_mean = np.mean([e['r'] for e in ep_infos]) or 0
-        len_mean = np.mean([e['l'] for e in ep_infos]) or 0
+        # Logging
+        if step % LOG_INTERVAL == 0:
+            rew_mean = np.mean([e['r'] for e in ep_infos]) or 0
+            len_mean = np.mean([e['l'] for e in ep_infos]) or 0
 
-        print()
-        print('Step', step)
-        print('Average reward', rew_mean)
-        print('Average episode length', len_mean)
-        print('Episodes', episode_count)
-        summary_writer.add_scalar('AvgRew', rew_mean, global_step=step)
-        summary_writer.add_scalar('AvgEpLen', len_mean, global_step=step)
-        summary_writer.add_scalar('Episodes', episode_count, global_step=step)
+            print()
+            print('Step', step)
+            print('Average reward', rew_mean)
+            print('Average episode length', len_mean)
+            print('Episodes', episode_count)
+            summary_writer.add_scalar('AvgRew', rew_mean, global_step=step)
+            summary_writer.add_scalar('AvgEpLen', len_mean, global_step=step)
+            summary_writer.add_scalar('Episodes', episode_count, global_step=step)
 
-    if step % SAVE_INTERVAL == 0 and step != 0:
-        print()
-        print("Saving...")
-        save_state_dict(online_net, env='breakout', step=str(step), v='2')
+        if step % SAVE_INTERVAL == 0 and step != 0:
+            print()
+            print("Saving...")
+            save_state_dict(online_net, env='breakout', step=str(step), v='2')
