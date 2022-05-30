@@ -82,10 +82,11 @@ class DeepQNetworkAgent(nn.Module):
         rewards = torch.tensor(rewards, device=self.device, dtype=torch.float32).unsqueeze(-1)
 
         # Compute targets
-        target_q_values = target_net(next_states)
-        max_target_q_values = target_q_values.max(dim=1, keepdim=True)[0]
+        with torch.no_grad():
+            target_q_values = target_net(next_states)
+            max_target_q_values = target_q_values.max(dim=1, keepdim=True)[0]
 
-        targets = rewards + gamma * (1 - dones) * max_target_q_values
+            targets = rewards + gamma * (1 - dones) * max_target_q_values
 
         # Compute Loss
         # we got a set of q values for each state
