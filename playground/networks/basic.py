@@ -17,6 +17,7 @@ def fc(fc_dims: list[int]) -> nn.Sequential:
     layers = build_fc(fc_dims)
 
     net = nn.Sequential(*layers)
+    net.apply(init_weights)
     return net
 
 
@@ -43,4 +44,11 @@ def cnn(observation_space, cnn_structure: list[CnnStructure], fc_hidden_dims: li
     fc_layers = build_fc([tensors, *fc_hidden_dims, out_dim])
 
     net = nn.Sequential(*cnn_layers, nn.Flatten(), *fc_layers)
+    net.apply(init_weights)
     return net
+
+
+def init_weights(m):
+    if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+        nn.init.kaiming_uniform_(m.weight, nonlinearity='relu')
+
