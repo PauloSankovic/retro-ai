@@ -1,0 +1,5 @@
+>>> import numpy as np
+>>> from gym.spaces import Box
+>>> b = Box(low=-1.0, high=2.0, shape=(3,), dtype=np.float32)
+>>> b.sample()
+array([-0.3791686 , -0.35007873,  0.8138365 ], dtype=float32)

@@ -1,0 +1,5 @@
+>>> from gym.spaces import Discrete
+>>> d = Discrete(3)             # {0, 1, 2}
+>>> d = Discrete(3, start=-1)   # {-1, 0, 1}
+>>> d.sample()
+1
