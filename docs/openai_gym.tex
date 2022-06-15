@@ -45,7 +45,7 @@ Razred \texttt{Box} predstavlja strukturu podataka u kontinuiranom \texttt{n}-di
     \label{lst:box-code}
 \end{listing}
 
-Razred \texttt{Discrete} s druge strane, predstavlja strukturu podataka u diskretnom \texttt{n}-dimenzionalnom prostoru gdje su validne vrijednosti sve cjelobrojne vrijednosti unutar intervala \texttt{\{0, ..., n - 1\}} (početna vrijednost se može specificirati). Kod \ref{lst:discrete-code} prikazuje inicijalizacije \texttt{Discrete} strukture podataka ovisno o specificiranoj početnoj vrijednosti.
+Razred \texttt{Discrete} s druge strane, predstavlja strukturu podataka u diskretnom \texttt{n}-dimenzionalnom prostoru gdje su validne vrijednosti sve cjelobrojne vrijednosti unutar intervala $[0, n-1]$ (početna vrijednost se može specificirati). Kod \ref{lst:discrete-code} prikazuje inicijalizacije \texttt{Discrete} strukture podataka ovisno o specificiranoj početnoj vrijednosti.
 
 \begin{listing}[H]
     \caption{Primjer korištenja strukture diskretnog prostora \texttt{Discrete}}
@@ -74,15 +74,17 @@ Koristeći standardne metode stvaranja i interakcije s Gym okruženjem, pokreće
 
 U OpenAI Gym ekosustavu dostupno je puno okruženja koja omogućuju interakciju s agentom. Neki od njih su: \textit{Atari} - skup od Atari 2600 okolina, \textit{MuJoCo} (punim nazivom \textit{Multi-Joint dynamics with Contact}) - skup okolina za provođenje istraživanja i razvoja u robotici, biomehanici, grafici i drugim područjima gdje je potrebna brzina i točna simulacija, \textit{Classic Control} - skup okolina koje opisuju poznate fizikalne eksperimente. Opisat ćemo neke od najkorištenijih okolina.
 
+Upravljanje agentima i njihovo izvođenje akcija u određenoj atari okolini interno je implementirano koristeći objektno orijentiranu razvojnu cjelinu \engl{framework} \textit{The Arcade Learning Environment} (skraćeno \textit{ALE}). Na taj način razdvajaju se slojevi emulacije okruženja (koristeći Atari 2600 emulator \textit{Stella}), sloj koji kontrolira samog agenta \textit{(ALE)} i sloj koji pruža jednostavnu programsku implementaciju i interakciju \textit{(OpenAI Gym)}\cite{OpenAIALE}. 
+
 \subsection{Okruženje CartPole}
 
 Ovo okruženje modelira fizikalni problem održavanja ravnoteže. Inačica je sličnog fizikalnog problema pod nazivom \textit{obrnuto njihalo} \engl{Inverted pendulum}. Za pomična kolica zakvačen je stupić. Njegovo težište nalazi se iznad središta mase i na taj način osigurava da sustav nije stabilan.  Zglob, odnosno dodirna točka između stupića i kolica nema trenja niti drugih gubitaka. Također, kolica koja se kreću vodoravno po putanji u 2 smjera nemaju trenja niti drugih gubitaka. Cilj ovog fizikalnog problema jest uravnotežiti stup primjenom sila i pomicanjem kolica u lijevom ili desnom smjeru.
 
-Za svaki poduzeti korak okolina dodjeljuje nagradu u vrijednosti $+1$. Struktura valjanih akcija koje agent može poduzeti (\texttt{action_space}) instanca je razreda \texttt{Discrete(2,)} - skup akcija je diskretan i u svakom koraku je moguće odabrati 1 od maksimalno 2 dostupne akcije. Opis značenja svake akcije opisan je u tablici \ref{table:cart-pole-action}. S druge strane, objekt koji predstavlja strukturu stanja okoline u određenom vremenskom trenutku (\texttt{observation_space}) instanca je razreda \texttt{Box(4)} – stanje se sastoji od 4 kontinuirane vrijednosti od kojih su neke ograničene i odozdo i odozgo. Točan opis i granice vrijednosti predočeni su u tablici \ref{table:cart-pole-observation}.
+Za svaki poduzeti korak okolina dodjeljuje nagradu u vrijednosti $+1$. Struktura valjanih akcija koje agent može poduzeti (\texttt{action_space}) instanca je razreda \texttt{Discrete(2)} - skup akcija je diskretan i u svakom koraku je moguće odabrati 1 od maksimalno 2 dostupne akcije. Opis značenja svake akcije prikazan je u tablici \ref{table:cart-pole-action}. S druge strane, objekt koji predstavlja strukturu stanja okoline u određenom vremenskom trenutku (\texttt{observation_space}) instanca je razreda \texttt{Box(4)} – stanje se sastoji od 4 kontinuirane vrijednosti od kojih su neke ograničene i odozdo i odozgo. Točan opis i granice vrijednosti predočeni su u tablici \ref{table:cart-pole-observation}.
 
 \begin{table}[ht]
     \centering
-    \caption{Opis valjanih akcija - atribut \texttt{action_space}}
+    \caption{Opis valjanih akcija okoline CartPole - atribut \texttt{action_space}}
     \begin{tabular}{c c}
         \hline
         Akcija & Opis akcije  \\
@@ -95,7 +97,7 @@ Za svaki poduzeti korak okolina dodjeljuje nagradu u vrijednosti $+1$. Struktura
 
 \begin{table}[ht]
     \centering
-    \caption{Opis strukture okoline - atribut \texttt{observation_space}}
+    \caption{Opis strukture okoline okoline CartPole - atribut \texttt{observation_space}}
     \begin{tabular}{c c c c}
         \hline
         Indeks & Opis & Donja granica & Gornja granica \\
@@ -112,12 +114,59 @@ Početno stanje okoline inicijalizira pozivom metode \texttt{reset()}, slučajni
 
 \begin{figure}[H]
     \centering
-    \frame{\includegraphics[height=5cm]{assets/cart-pole.png}}
-    \caption{Prikaz CartPole okoline}
+    \frame{\includegraphics[height=5.5cm]{assets/cart-pole-not-mine.png}}
+    \caption{Prikaz CartPole okoline zajedno s vrijednostima okoline - TODO}
     \label{fig:cart-pole}
 \end{figure}
 
-\subsection{Breakout}
+\subsection{Okruženje Breakout}
+
+Ova okolina simulira poznatu Atari 2600 igru u kojoj je cilj sakupiti što više bodova pomičući platformu i održavajući lopticu na ekranu. Platforma je postavljena na dnu ekrana, na fiksnoj visini i moguće ju je pomicati u dva smjera. Loptica se odbija između zidova, platforme i 6 razina \textit{ciglenih} blokova čijim razbijanjem se sakupljaju bodovi. Ako loptica padne ispod platforme koju igrač kontrolira, gubi se život. Igra završava kada igrač potroši 5 života, odnosno kada 5 puta loptica padne ispod platforme. 
+
+Skup validnih akcija je instanca razreda \texttt{Discrete(4)} - skup akcija je diskretan i u svakom koraku je moguće odabrati 1 od maksimalno 4 dostupne akcije. Opis značenja svake akcije prikazan je u tablici \ref{table:breakout-action}. Kao opis trenutnog stanja okoline moguće je dobiti RGB vrijednosti svakog piksela slike (slike dimenzije 210 * 160) ili vrijednosti radne memorije \textit{ALE} okoline (128 bajta) - što je korisno jer možemo preskočiti korak učenja reprezentacije okoline (preskačemo dio gdje algoritmi učenja moraju iz piksela slike naučiti reprezentaciju). Razlike u strukturi objekta okoline prikazane su u tablici \ref{table:breakout-observation}. 
+
+\begin{table}[ht]
+    \centering
+    \caption{Opis valjanih akcija okoline Breakout - atribut \texttt{action_space}}
+    \begin{tabular}{c c c}
+        \hline
+        Akcija & Opis akcije & Detaljniji opis akcije  \\
+        \hline
+        0 & NOOP & Ne poduzima se nikakva akcija \\
+        1 & FIRE & Akcija koja pokreće igru \\ 
+        2 & RIGHT & Platforma se pomiče udesno \\ 
+        3 & LEFT & Platforma se pomiče ulijevo  \\ 
+    \end{tabular}
+    \label{table:breakout-action}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{Opis strukture objekta okoline Breakout - atribut \texttt{observation_space}}
+    \begin{tabular}{c c}
+        \hline
+        Indeks & Struktura  \\
+        \hline
+        RAM vrijednosti & \texttt{Box(0, 255, (128,), uint8)}  \\ 
+        Vrijednosti RGB slike & \texttt{Box(0, 255, (210, 160, 3), uint8)}  \\
+    \end{tabular}
+    \label{table:breakout-observation}
+\end{table}
+
+Nagrada dolazi u obliku bodova koji se dobiju uništavajući \textit{ciglene} blokove. Vrijednost nagrade ovisi o boji cigle. Izgled same okoline prikazan je na slici \ref{fig:breakout}.
+
+\begin{figure}[H]
+    \centering
+    \frame{\includegraphics[width=10cm]{assets/breakout.png}}
+    \caption{Prikaz Breakout okoline}
+    \label{fig:breakout}
+\end{figure}
 
 
 % TODO dodati za literaturu https://blog.paperspace.com/getting-started-with-openai-gym/ i https://www.gymlibrary.ml/content/vector_api/
+
+% TODO dodati za literaturu https://atariage.com/manual_html_page.php?SoftwareID=889
+
+% značenje pojedinih ram pozicija https://github.com/mila-iqia/atari-representation-learning/blob/master/atariari/benchmark/ram_annotations.py
+
+% https://stackoverflow.com/questions/45207569/how-to-interpret-the-observations-of-ram-environments-in-openai-gym
