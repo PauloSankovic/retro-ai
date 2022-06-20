@@ -76,6 +76,8 @@ U OpenAI Gym ekosustavu dostupno je puno okruženja koja omogućuju interakciju 
 
 Upravljanje agentima i njihovo izvođenje akcija u određenoj atari okolini interno je implementirano koristeći objektno orijentiranu razvojnu cjelinu \engl{framework} \textit{The Arcade Learning Environment} (skraćeno \textit{ALE}). Na taj način razdvajaju se slojevi emulacije okruženja (koristeći Atari 2600 emulator \textit{Stella}), sloj koji kontrolira samog agenta \textit{(ALE)} i sloj koji pruža jednostavnu programsku implementaciju i interakciju \textit{(OpenAI Gym)}\cite{OpenAIALE}. 
 
+% TODO stohastika i determinizam - https://www.gymlibrary.ml/environments/atari/
+
 \subsection{Okruženje CartPole}
 
 Ovo okruženje modelira fizikalni problem održavanja ravnoteže. Inačica je sličnog fizikalnog problema pod nazivom \textit{obrnuto njihalo} \engl{Inverted pendulum}. Za pomična kolica zakvačen je stupić. Njegovo težište nalazi se iznad središta mase i na taj način osigurava da sustav nije stabilan.  Zglob, odnosno dodirna točka između stupića i kolica nema trenja niti drugih gubitaka. Također, kolica koja se kreću vodoravno po putanji u 2 smjera nemaju trenja niti drugih gubitaka. Cilj ovog fizikalnog problema jest uravnotežiti stup primjenom sila i pomicanjem kolica u lijevom ili desnom smjeru.
@@ -104,13 +106,13 @@ Za svaki poduzeti korak okolina dodjeljuje nagradu u vrijednosti $+1$. Struktura
         \hline
         0 & Pozicija kolica & $-4.8$ & $4.8$ \\
         1 & Brzina kolica & $-\infty$ & $\infty$ \\ 
-        2 & Nagib štapića i kolica & $-0.418 rad$ & $0.418 rad$ \\
+        2 & Nagib štapića i kolica & $-0.418 \text{rad}$ & $0.418 \text{rad}$ \\
         3 & Brzina štapića na vrhu & $-\infty$ & $\infty$ \\
     \end{tabular}
     \label{table:cart-pole-observation}
 \end{table}
 
-Početno stanje okoline inicijalizira pozivom metode \texttt{reset()}, slučajnim vrijednostima iz uniformne razdiobe na intervalu $\pm 0.05$. Okolina podržava 3 uvjeta zaustavljanja (uvjeti koji označuju da je riječ o terminalnom stanju): nagib štapića i kolica je izvan intervala $\pm 0.2095 rad$, pozicija sredine kolica je izvan intervala $\pm 2.4$ (sredina kolica dotiče rub vidljivog prostora) i duljina epizode je veća od $500$ koraka. Na slici \ref{fig:cart-pole} prikazana je okolina CartPole zajedno s vrijednostima okoline. % TODO napraviti
+Početno stanje okoline inicijalizira pozivom metode \texttt{reset()}, slučajnim vrijednostima iz uniformne razdiobe na intervalu $\pm 0.05$. Okolina podržava 3 uvjeta zaustavljanja (uvjeti koji označuju da je riječ o terminalnom stanju): nagib štapića i kolica je izvan intervala $\pm 0.2095 \text{rad}$, pozicija sredine kolica je izvan intervala $\pm 2.4$ (sredina kolica dotiče rub vidljivog prostora) i duljina epizode je veća od $500$ koraka. Na slici \ref{fig:cart-pole} prikazana je okolina CartPole zajedno s vrijednostima okoline. % TODO napraviti
 
 \begin{figure}[H]
     \centering
@@ -153,7 +155,7 @@ Skup validnih akcija je instanca razreda \texttt{Discrete(4)} - skup akcija je d
     \label{table:breakout-observation}
 \end{table}
 
-Nagrada dolazi u obliku bodova koji se dobiju uništavajući \textit{ciglene} blokove. Vrijednost nagrade ovisi o boji cigle. Izgled same okoline prikazan je na slici \ref{fig:breakout}.
+Nagrada dolazi u obliku bodova koji se dobivaju uništavajući \textit{ciglene} blokove. Vrijednost nagrade ovisi o boji cigle. Izgled same okoline prikazan je na slici \ref{fig:breakout}.
 
 \begin{figure}[H]
     \centering
@@ -163,7 +165,7 @@ Nagrada dolazi u obliku bodova koji se dobiju uništavajući \textit{ciglene} bl
 \end{figure}
 
 
-% TODO dodati za literaturu https://blog.paperspace.com/getting-started-with-openai-gym/ i https://www.gymlibrary.ml/content/vector_api/
+% TODO dodati za literaturu https://blog.paperspace.com/getting-started-with-openai-gym/ i https://www.gymlibrary.ml/content/vector_api/ i https://www.gymlibrary.ml/ općenito
 
 % TODO dodati za literaturu https://atariage.com/manual_html_page.php?SoftwareID=889
 
