@@ -24,8 +24,8 @@
 \newif\if@radzavrsni		\global\@radzavrsnifalse
 \newif\if@radseminar		\global\@radseminartrue
 \newif\if@raddiplomski		\global\@raddiplomskifalse
-\newif\if@citeauthoryear	\global\@citeauthoryeartrue
-\newif\if@citenumeric		\global\@citenumericfalse
+\newif\if@citeauthoryear	\global\@citeauthoryearfalse
+\newif\if@citenumeric		\global\@citenumerictrue
 \newif\if@encutf			\global\@encutftrue
 \newif\if@enccp				\global\@enccpfalse
 
