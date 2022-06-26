@@ -55,13 +55,13 @@ Razred \texttt{Discrete} s druge strane, predstavlja strukturu podataka u diskre
 
 \subsection{Omotači}
 
-Omotači \engl{Wrappers} su prikladne strukture koje omogućavaju izmjenu elemenata postojećeg okruženja bez potrebe za mijenjanjem originalnog koda. Omotači omogućavaju modularnost, mogu se implementirati prema vlastitim potrebama i ulančavati. Ova funkcionalnost vrlo se često koristi u situacijama kada pri treniranju modela želimo normalizirati ulaze (skalirati piksele slike), provesti regularizaciju (podrezivanje vrijednosti nagrade), transformirati ulaze u Pytorch dimenzije, implementirati preskakanje slikovnih okvira...  Navedene funkcionalnosti moguće je postići tako da definiramo vlastiti omotač koji će nasljeđivati ili obični \texttt{Wrapper} nadrazred ili specifičnije razrede poput \texttt{ObservationWrapper}, \texttt{RewardWrapper}, \texttt{ActionWrapper}...
+Omotači \engl{Wrappers} su prikladne strukture koje omogućavaju izmjenu elemenata postojećeg okruženja bez potrebe za mijenjanjem originalnog koda. Omotači omogućavaju modularnost, mogu se implementirati prema vlastitim potrebama i ulančavati. Ova funkcionalnost vrlo se često koristi u situacijama kada pri treniranju modela želimo normalizirati ulaze (skalirati vrijednosti slikovnih jedinica), provesti regularizaciju (podrezivanje vrijednosti nagrade), transformirati ulaze u \textit{PyTorch} dimenzije, implementirati metodu preskakanja slikovnih okvira...  Navedene funkcionalnosti moguće je postići tako da definiramo vlastiti omotač koji će nasljeđivati ili obični \texttt{Wrapper} nadrazred ili specifičnije razrede poput \texttt{ObservationWrapper}, \texttt{RewardWrapper}, \texttt{ActionWrapper}...
 
 \subsection{Vektorizirana okruženja}
 
-Koristeći standardne metode stvaranja i interakcije s Gym okruženjem, pokrećemo samo jednu instancu okruženja i na taj način ne iskorištavamo potpuno računalnu snagu koja nam je dostupna. Vektorizirana okruženja \engl{Vectorized environments} su okruženja koja paralelno pokreću više kopija istog okruženja u svrhu poboljšanja učinkovitosti i ubrzanja procesa učenja agenta.
+Koristeći standardne metode stvaranja i interakcije s Gym okruženjem, pokrećemo samo jednu instancu okruženja i na taj način ne iskorištavamo računalnu snagu koja nam je dostupna u potpunosti. Vektorizirana okruženja \engl{Vectorized environments} su okruženja koja paralelno pokreću više kopija istog okruženja u svrhu poboljšanja učinkovitosti i ubrzanja procesa učenja agenta i njegove interakcije s kopijama okolina.
 
-?? TODO nastaviti ovo jer su sada objavili novu verziju u kojoj je već u Gym-u ukomponiran Vector API a ja sam do sada bio koristio njihov library \textit{baselines}. ?? - ponovna implementacija i usporedba
+\textit{Python} biblioteka \textit{stable-baselines} \cite{BaselinesVecEnvs} pruža gotove omotače koji omogućavaju pokretanje $n$ paralelnih neovisnih instanci okolina. Paralelna obrada interno je implementirana korištenjem \textit{multiprocessing} paketa. Zbog paralelne interakcije agenta s više okolina potrebno je prilagoditi strukturu objekata. Agent predaje omotanoj okolini niz od $n$ akcija i dobiva listu povratnih informacija (stanje pojedinačne okoline, nagrada i zastavica terminalnog stanja) u formi liste $n$ vrijednosti.
 
 \begin{figure}[H]
     \centering
@@ -74,9 +74,13 @@ Koristeći standardne metode stvaranja i interakcije s Gym okruženjem, pokreće
 
 Upravljanje agentima i njihovo izvođenje akcija u određenoj atari okolini interno je implementirano koristeći objektno orijentiranu razvojnu cjelinu \engl{framework} \textit{The Arcade Learning Environment} (skraćeno \textit{ALE}). Na taj način razdvajaju se slojevi emulacije okruženja (koristeći Atari 2600 emulator \textit{Stella}), sloj koji kontrolira samog agenta \textit{(ALE)} i sloj koji pruža jednostavnu programsku implementaciju i interakciju \textit{(OpenAI Gym)} \cite{OpenAIALE}. 
 
-Originalna Atari 2600 konzola nije imala izvor entropije za generiranje pseudoslučajnih brojeva i iz tog razloga okruženje je bilo u potpunosti determinističko - svaka igra počinje u istom stanju, a ishodi su u potpunosti određeni stanjem i akcijom \cite{AleDeterministic}. Iz tog razloga vrlo je jednostavno postići visoku uspješnost agenta u okolini pamćenjem dobrog niza akcija. Nama to ne odgovara jer želimo postići da agent nauči donositi dobre odluke. U novijim verzijama ALE-a i \textit{OpenAI Gym}-a implementirani su različiti pristupi za postizanje određenog stupnja stohastičnosti. 
+Originalna Atari 2600 konzola nije imala izvor entropije za generiranje pseudoslučajnih brojeva i iz tog razloga okruženje je bilo u potpunosti determinističko - svaka igra počinje u istom stanju, a ishodi su u potpunosti određeni stanjem i akcijom \cite{AleDeterministic}. Iz tog razloga vrlo je jednostavno postići visoku uspješnost agenta u okolini pamćenjem dobrog niza akcija. Nama to ne odgovara jer želimo postići da agent nauči donositi dobre odluke. Pristupi kojima se nastoji uvesti određen stupanj stohastike su \textit{sticky actions}, \textit{frame skipping}, \textit{initial no-ops}, te \textit{random action noise}. 
 
-Pristupi kojima se želi postići stohastičnost su ponavljanje prethodne akcije (engl. \textit{sticky actions}), nasumično preskakanje slikovnih okvira \engl{random frame skip}, odsustvo niza akcija na početku epizode \engl{initial no-ops} te postupak zamjene akcije drugom nasumično odabranom akcijom \engl{random action noise}. Navedeni pristupi mogu se specificirati prilikom instanciranja okoline. 
+\textit{Frame skipping} pristup pri svakom koraku okoline uzima zadnju akciju koju je agent odabrao i ponavlja ju $n$ broj puta (kroz $n$ slikovnih okvira). Ovisno o verzijama okoline, broj ponavljanja može se specificirati tipom \texttt{int} - cijelobrojnom fiksnom vrijednošću (determinizam), ili tipom \texttt{tuple(2)} - bira se slučajno odabrana vrijednost unutar specificiranog intervala (stohastika). Osim potencijalnog uvođenja stohastike, ovaj pristup pojednostavljuje problem podržanog učenja i ubrzava izvođenje \cite{AleDeterministic}. Tehnika \textit{initial no-ops} označava da na početku epizode okolina ignorira akcije agenta slučajan broj puta iz intervala $[0, n]$ - izvršava akciju \texttt{NOOP}. Osim što na početku agent ne zna kada će okolina početi koristiti njegove akcije, ostatak interakcije s okolinom je i dalje deterministički \cite{AleDeterministic}. Sličan pristup bio bi i da potičemo raznolikost početnih stanja objekta s kojim upravljamo. To bi postigli nasumičnim poduzimanjem niza akcija kojima pomičemo objekt prije samog aktiviranja posebne akcije \texttt{FIRE} \cite{MediumDeterministic}.
+
+Tehnika \textit{random action noise} zamjenjuje odabranu akciju agenta nasumičnom akcijom samo ako je vjerojatnost zamjene manja od specificirane vrijednosti. Ovo uspješno uvođenje stohastike dolazi s negativnim posljedicama poduzimanja slučajne akcije koja može značajno poremetiti politiku agenta i smanjiti učinak \cite{AleDeterministic}. Odabir slučajne akcije bolje je zamijeniti pristupom ponavljanja prethodno odabrane akcije uzimajući u obzir parametar vjerojatnosti zamjene akcije - \textit{stickiness}. Riječ je o \textit{sticky actions} pristupu koji uvodi stohastiku, te ne ometa odabir akcije agenta koji može biti siguran da njegove akcije neće biti pogubne za ostatak iterakcije s okolinom.
+
+Pristupi \textit{sticky actions} i \textit{frame skipping} dio su \textit{OpenAI Gym} biblioteke i mogu se specificirati prilikom instanciranja okoline, dok je \textit{random action noise} i \textit{initial no-ops} tehnike potrebno manualno implementirati ili se osloniti na izvedbu u poznatim \textit{Python} bibliotekama \textit{stable-baselines} i \textit{stable-baselines3}.
 
 \section{Okruženja}
 
@@ -118,12 +122,12 @@ Za svaki poduzeti korak okolina dodjeljuje nagradu u vrijednosti $+1$. Struktura
     \label{table:cart-pole-observation}
 \end{table}
 
-Početno stanje okoline inicijalizira se pozivom metode \texttt{reset()} slučajnim vrijednostima iz uniformne razdiobe na intervalu $[- 0.05, 0.05]$. Okolina podržava 3 uvjeta zaustavljanja (uvjeti koji označuju da je riječ o terminalnom stanju): nagib štapića i kolica je izvan intervala $[-0.2095, 0.2095] \text{rad}$, pozicija sredine kolica je izvan intervala $[-2.4, 2.4]$ (sredina kolica dotiče rub vidljivog prostora) i duljina epizode veća je od $500$ koraka. Na slici \ref{fig:cart-pole} prikazana je okolina CartPole zajedno s vrijednostima okoline. % TODO napraviti svoje koje bolje izgleda
+Početno stanje okoline inicijalizira se pozivom metode \texttt{reset()} slučajnim vrijednostima iz uniformne razdiobe na intervalu $[- 0.05, 0.05]$. Okolina podržava 3 uvjeta zaustavljanja (uvjeti koji označuju da je riječ o terminalnom stanju): nagib štapića i kolica je izvan intervala $[-0.2095, 0.2095] \text{rad}$, pozicija sredine kolica je izvan intervala $[-2.4, 2.4]$ (sredina kolica dotiče rub vidljivog prostora) i duljina epizode veća je od $500$ koraka. Na slici \ref{fig:cart-pole} prikazana je okolina CartPole zajedno s vrijednostima okoline.
 
 \begin{figure}[H]
     \centering
     \frame{\includegraphics[height=5.5cm]{assets/cart-pole-not-mine.png}}
-    \caption{Izgled i vrijednosti CartPole okoline - TODO}
+    \caption{Izgled i vrijednosti CartPole okoline \cite{CartPoleValues}}
     \label{fig:cart-pole}
 \end{figure}
 
