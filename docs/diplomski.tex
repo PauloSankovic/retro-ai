@@ -5,10 +5,19 @@
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{gensymb}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage[]{pdfpages}
 
 \setminted{breaklines, framesep=2mm, fontsize=\footnotesize, numbersep=10pt, linenos}
 \renewcommand\listingscaption{Kôd}
+
+\makeatletter
+\renewcommand{\ALG@name}{Algoritam}
+\makeatother
+
+% Expectation symbol
+\DeclareMathOperator*{\E}{\mathbb{E}}
 
 \begin{document}
 
@@ -25,6 +34,7 @@
 \include{uvod}
 \include{podrzano_ucenje}
 \include{openai_gym}
+\include{stable_baselines}
 \include{implementacija}
 \include{poboljsanja}
 \include{zakljucak}

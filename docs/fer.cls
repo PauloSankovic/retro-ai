@@ -330,7 +330,7 @@
 {\end{list}}
 
 % Naredba \engl
-\newcommand{\engl}[1]{(engl.~\emph{#1})}
+\newcommand{\engl}[1]{(engl. \emph{#1})}
 
 % Sažetak na hrvatskom
 \newenvironment{sazetak}

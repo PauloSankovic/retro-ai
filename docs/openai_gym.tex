@@ -1,13 +1,13 @@
 \chapter{OpenAI Gym}
 
-OpenAI Gym je Python biblioteka \engl{library} otvorenog koda \engl{open source} koja služi za razvijanje i usporedbu agenata u odabranim okolinama. Iznimno je popularna u sferi simpatizera i programera koji se bave razvijanjem modela podržanog učenja zbog jednostavnosti korištenja, velikog broja dostupnih okolina i jednostavnog stvaranja novih okolina, te jednostavne interakcije agenta i okoline. OpenAI Gym biblioteka se redovito održava i trenutno je na verziji \texttt{0.24.1}. 
+\textit{OpenAI Gym} je \textit{Python} biblioteka \engl{library} otvorenog koda \engl{open source} koja služi za razvijanje i usporedbu agenata u odabranim okolinama. Iznimno je popularna u sferi simpatizera i programera koji se bave razvijanjem modela podržanog učenja zbog jednostavnosti korištenja, velikog broja dostupnih okolina i jednostavnog stvaranja novih okolina, te jednostavne interakcije agenta i okoline. \textit{OpenAI Gym} biblioteka se redovito održava i trenutno je u verziji \texttt{0.24.1}. 
 
 \section{Struktura}
 
 Interakcija agenta i okoline podijeljena je na epizode. Na početku svake epizode, početno stanje se nasumično uzorkuje iz distribucije, i interakcija se nastavlja sve dok se okolina ne nađe u terminalnom stanju \cite{OpenAIWhitepaper}.
 
 \begin{listing}[H]
-    \caption{Jednostavan primjer integracije agenta i Gym okoline (1 epizoda)}
+    \caption{Jednostavan primjer integracije agenta i \textit{Gym} okoline (1 epizoda)}
     \inputminted{python}{snippets/init.py}
     \label{lst:init-code}
 \end{listing}
@@ -23,7 +23,7 @@ Kod \ref{lst:init-code} prikazuje potpunu implementaciju jednostavne interakcije
 
 \subsection{Okolina}
 
-Temelj oko kojeg se zasniva OpenAI Gym biblioteka jest razred \engl{class} \texttt{Env} koji u suštini implementira simulator koji pokreće okruženje u kojem naš agent može interaktirati s okolinom. Točnije rečeno, enkapsulira sva potrebna ponašanja i metode koje su potrebne za jednostavnu interakciju. Objekt tipa \texttt{Env} stvara se pozivanjem funkcije \texttt{gym.make()} (kod \ref{lst:init-code} linija 3) kojoj se predaje identifikator okoline (\texttt{id}) zajedno s opcionalnim argumentima (metapodatcima). 
+Temelj oko kojeg se zasniva \textit{OpenAI Gym} biblioteka jest razred \engl{class} \texttt{Env} koji u suštini implementira simulator koji pokreće okruženje u kojem naš agent može interaktirati s okolinom. Točnije rečeno, enkapsulira sva potrebna ponašanja i metode koje su potrebne za jednostavnu interakciju. Objekt tipa \texttt{Env} stvara se pozivanjem funkcije \texttt{gym.make()} (kod \ref{lst:init-code} linija 3) kojoj se predaje identifikator okoline (\texttt{id}) zajedno s opcionalnim argumentima (metapodatcima). 
 
 \subsection{Interakcija s okolinom}
 
@@ -80,7 +80,7 @@ Originalna Atari 2600 konzola nije imala izvor entropije za generiranje pseudosl
 
 Tehnika \textit{random action noise} zamjenjuje odabranu akciju agenta nasumičnom akcijom samo ako je vjerojatnost zamjene manja od specificirane vrijednosti. Ovo uspješno uvođenje stohastike dolazi s negativnim posljedicama poduzimanja slučajne akcije koja može značajno poremetiti politiku agenta i smanjiti učinak \cite{AleDeterministic}. Odabir slučajne akcije bolje je zamijeniti pristupom ponavljanja prethodno odabrane akcije uzimajući u obzir parametar vjerojatnosti zamjene akcije - \textit{stickiness}. Riječ je o \textit{sticky actions} pristupu koji uvodi stohastiku, te ne ometa odabir akcije agenta koji može biti siguran da njegove akcije neće biti pogubne za ostatak iterakcije s okolinom.
 
-Pristupi \textit{sticky actions} i \textit{frame skipping} dio su \textit{OpenAI Gym} biblioteke i mogu se specificirati prilikom instanciranja okoline, dok je \textit{random action noise} i \textit{initial no-ops} tehnike potrebno manualno implementirati ili se osloniti na izvedbu u poznatim \textit{Python} bibliotekama \textit{stable-baselines} i \textit{stable-baselines3}.
+Pristupi \textit{sticky actions} i \textit{frame skipping} dio su \textit{OpenAI Gym} biblioteke i mogu se specificirati prilikom instanciranja okoline, dok je \textit{random action noise} i \textit{initial no-ops} tehnike potrebno manualno implementirati ili se osloniti na izvedbu u poznatim \textit{Python} bibliotekama poput \textit{stable-baselines3}.
 
 \section{Okruženja}
 
@@ -172,7 +172,7 @@ Nagrada dolazi u obliku bodova koji se dobivaju uništavajući \textit{ciglene} 
 \begin{figure}[H]
     \centering
     \frame{\includegraphics[width=10cm]{assets/breakout.png}}
-    \caption{Okolina Breakout}
+    \caption{Izgled Breakout okoline}
     \label{fig:breakout}
 \end{figure}
 

@@ -1,0 +1,25 @@
+\chapter{Stable Baselines3}
+
+Poznatije biblioteke otvorenog koda za programski jezik \textit{Python} koje prvenstveno pružaju implementacije algoritama podržanog učenja su \textit{Stable Baselines3}, \textit{RLlib}, \textit{Tensorforce}... Njihove implementacije algoritama i naučene modele korisno je koristiti pri usporedbi performansi vlastitih implementacija. Navedene biblioteke koriste \textit{OpenAI Gym} okruženja za razvijanje, testiranje i usporedbu agenata.
+
+Stable Baselines3 (SB3) biblioteka sadrži skup implementacija algoritama podržanog učenja. Za oblikovanje dubokih modela korištena je \textit{PyTorch} biblioteka. Algoritmi su neovisni o modelu \engl{model-free} i ograničeni na interakciju jednog agenta s okolinom \engl{single-agent}. SB3 predstavlja nadogradnju \textit{Stable Baselines} i \textit{OpenAI Baselines} biblioteka koje za oblikovanje dubokih modela koriste \textit{TensorFlow} biblioteku. U odnosu na njih, SB3 je bolje dokumentiran, 95\% koda je pokriveno testovima \engl{test coverage}, te sadrži više implementiranih algoritama \cite{SB3}. 
+
+Odsječak koda \ref{lst:sb3} prikazuje jednostavnost korištenja SB3 biblioteke. U dvije linije koda postavili smo tip dubokog modela, identifikator okoline, specificirali algoritam učenja, te pokrenuli učenje modela sa specificiranim ukupan broj koraka.
+
+\begin{listing}[H]
+    \caption{Jednostavan primjer korištenja \textit{Stable Baselines3} biblioteke}
+    \inputminted{python}{snippets/sb3.py}
+    \label{lst:sb3}
+\end{listing}
+
+\section{Korištenje predtreniranih modela}
+
+Predtrenirane modele koji su objavljeni u javnom \textit{GitHub} repozitoriju \cite{sb3-alg-repo} koristit ćemo pri usporedbi ponašanja naših manualno implementiranih algoritama i pripadajućih agenata.
+
+Za uspješno pokretanje agenata potrebno je proučiti javni \textit{GitHub} repozitorij radnog okvira \textit{RL Baselines3 Zoo} \cite{rl-zoo3}, klonirati projekt i pokrenuti naredbu \ref{lst:sb3-zoo} koja pokreće \textit{Python} skriptu s dodatnim argumentima u kojima je specificiran algoritam, identifikator okoline i direktorij u kojem se nalazi prednaučen agent. \textit{RL Baselines3 Zoo} jest radni okvir koji koristi \textit{Stable Baselines3} biblioteku i pruža niz korisnih skripti za treniranje i evaluiranje agenata, podešavanje hiperparametara, iscrtavanje rezultata i snimanje videa.
+
+\begin{listing}[H]
+    \caption{Naredba za izvođenje \textit{Python} skripte i pokretanje predtreniranog modela}
+    \inputminted{powershell}{snippets/sb3-zoo.txt}
+    \label{lst:sb3-zoo}
+\end{listing}

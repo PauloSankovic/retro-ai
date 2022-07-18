@@ -4,7 +4,7 @@ Strojno učenje \engl{Machine learning} je grana umjetne inteligencije \engl{art
 
 Strojno učenje dijeli se na 3 podvrste: nadzirano učenje, nenadzirano učenje i podržano (ojačano) učenje. Nadzirano učenje \engl{supervised learning} karakterizira učenje modela nad testnim podatcima koji su označeni. Model točno zna da za određeni ulaz mora vratiti izlaz koji je istovjetan unaprijed pridruženoj oznaci. Algoritam mjeri točnost kroz funkciju gubitka, prilagođavajući se sve dok se izračunata razlika izlaza modela i stvarnog izlaza (pogreška) ne smanji do određene mjere. S druge strane, u nenadziranom učenju \engl{unsupervised learning} posjedujemo podatke bez zadanog izlaza - podatci su dani bez ciljne vrijednosti i u tim situacijama treba pronaći određenu pravilnost. Postupci poput grupiranja, smanjenja dimenzionalnosti, otkrivanja veza između primjeraka... pripadaju nenadziranom učenju.
 
-Posebna i nama najzanimljivija podvrsta strojnog učenja jest podržano učenje (engl. \textit{reinforcement learning}). Podržano učenje bavi se optimizacijom ponašanja agenta koji je u interakciji s okolinom (u kojoj se nalazi) i koji izvršava akcije na temelju informacija koje dobiva iz okoline. Agent pri svakom koraku od okoline dobiva povratnu informaciju u obliku nagrade ili kazne. Za razliku od prethodne dvije navedene podvrste koje mapiraju ulazne podatke na određeni format izlaza, u podržanom učenju je najizraženije učenje iz iskustva koje je čovjeku i drugim živim bićima veoma blisko.
+Posebna i nama najzanimljivija podvrsta strojnog učenja jest podržano učenje \engl{reinforcement learning}. Podržano učenje bavi se optimizacijom ponašanja agenta koji je u interakciji s okolinom (u kojoj se nalazi) i koji izvršava akcije na temelju informacija koje dobiva iz okoline. Agent pri svakom koraku od okoline dobiva povratnu informaciju u obliku nagrade ili kazne. Za razliku od prethodne dvije navedene podvrste koje mapiraju ulazne podatke na određeni format izlaza, u podržanom učenju je najizraženije učenje iz iskustva koje je čovjeku i drugim živim bićima veoma blisko.
 
 \section{Ključni koncepti}
 
@@ -46,20 +46,41 @@ Najvažnija i najkorisnija informacija koju agent dobiva od okoline jest nagrada
     R(\tau) = r_0 + \gamma \cdot r_1 + \gamma^2 \cdot t_2 + \gamma^3 \cdot t_3 + ... = \sum_{t=0}^{\infty}\gamma^t r_t
 \end{equation}
 
+U našem slučaju agent interaktira sa stohastičkom okolinom i stoga funkciju politike \engl{policy function} (izraz \ref{md:policy-function}) predstavljamo kao probabilističku funkciju koja u obzir uzima stanje i akciju, i vraća vjerojatnost poduzimanja dane akcije $a_t$ u stanju $s_t$.
+
+\begin{equation}
+    \label{md:policy-function}
+    \pi(s, a) = P(a_t = a \mid s_t = s)
+\end{equation}
+
+Za slučaj kada agent odabire putanju $\tau$ koja je u skladu sa politikom $\pi$ počevši od stanja $s$, moguće je procijeniti ukupnu očekivanu nagradu. Riječ je o funkciji vrijednosti stanja \engl{value function} (izraz \ref{md:value-function}) koja nam u suštini govori koliko je dobro biti u određenom stanju poštujući politiku.
+
+\begin{equation}
+    \label{md:value-function}
+    V^{\pi}(s) = \E_{\tau \sim \pi} \left[ {R(\tau) \mid s_0 = s} \right]
+\end{equation}
+
+S druge strane, imamo funkciju vrijednosti stanja i akcije \engl{action-value function} (izraz \ref{md:action-value-function}) koja predstavlja ukupnu očekivanu nagradu za slučaj da se agent nalazi u stanju $s$ i poduzme akciju $a$ (koja možda nije dio politike) i zatim uvijek postupa prema politici $\pi$.
+
+\begin{equation}
+    \label{md:action-value-function}
+    Q^{\pi}(s,a) = \E_{\tau \sim \pi} \left[ {R(\tau) \mid s_0 = s, a_0 = a} \right]
+\end{equation}
+
 % TODO na sve ovo dodati literaturu https://spinningup.openai.com/en/latest/spinningup/rl_intro.html i http://java.zemris.fer.hr/nastava/ui/rl/rl-20200401.pdf
 
-Dakle, cilj podržanog učenja jest naći optimalnu strategiju (niz optimalnih akcija) koje maksimiziraju ukupnu (kumulativnu) nagradu. U svakom koraku interakcije agenta s okolinom, agent prima opis stanja okoline u kojoj se nalazi. S obzirom na to stanje, izvršava akciju koja vrši neku promjenu nad okolinom i prebacuje ju u novo stanje. Agent prima povratnu informaciju od okoline koja reprezentira koliko je odabrana akcija dobra. Opisana interakcija agenta i okoline prikazana je na slici \ref{fig:rl}.
+Dakle, cilj podržanog učenja jest pronaći optimalnu funkciju vrijednosti stanja ili funkciju vrijednosti stanja i akcije (ovisno o vrsti algoritma) te na taj način dobiti optimalnu politiku koja maksimizira ukupnu (kumulativnu) nagradu. U svakom koraku interakcije agenta s okolinom, agent prima opis stanja okoline u kojoj se nalazi. S obzirom na to stanje, izvršava akciju koja vrši neku promjenu nad okolinom i prebacuje ju u novo stanje. Agent prima povratnu informaciju od okoline koja reprezentira koliko je odabrana akcija dobra. Opisana interakcija agenta i okoline prikazana je na slici \ref{fig:rl}.
 
 \begin{figure}[H]
     \centering
-    \frame{\includegraphics[width=7cm]{assets/rl_diagram.png}}
-    \caption{Ciklus interakcije agenta s okolinom - TODO ref}
+    \frame{\includegraphics[width=9cm]{assets/rl_diagram.png}}
+    \caption{Ciklus interakcije agenta s okolinom \cite{wikiRL}}
     \label{fig:rl}
 \end{figure}
 
 \section{Duboki modeli}
 
-Duboko učenje \engl{Deep learning} jest tip strojnog učenja (točnije, podskup strojnog učenja) koje nastoji oponašati način zaključivanja i obrasce koje ljudski mozak koristi za učenje i donošenje odluka. Veliku ulogu u cijeloj ideji dubokog učenja imaju duboke neuronske mreže \engl{deep neural networks, DNN} pomoću kojih se povezivanjem više slojeva procesnih elemenata (čvorova, neurona), dobivaju duboki modeli koji su sposobni učiti i baratati s podatcima kompozitne strukture. Primjenom dubokih modela dolazimo do slijeda naučenih nelinearnih transformacija kojima aproksimiramo funkciju odluke, učimo mapiranje između ulaznih podataka i izlazih podataka, te nastojimo postići dobru generalizaciju nad stvarnim podatcima. 
+Duboko učenje \engl{Deep learning} jest tip strojnog učenja (točnije, podskup strojnog učenja) koje nastoji oponašati način zaključivanja i obrasce koje ljudski mozak koristi za učenje i donošenje odluka. Veliku ulogu u cijeloj ideji dubokog učenja imaju duboke neuronske mreže \engl{deep neural networks, DNN} pomoću kojih se povezivanjem više slojeva procesnih elemenata (čvorova, neurona), dobivaju duboki modeli koji su sposobni učiti i baratati s podatcima kompozitne strukture. Primjenom dubokih modela dolazimo do slijeda naučenih nelinearnih transformacija kojima aproksimiramo funkciju odluke, učimo mapiranje između ulaznih podataka i izlazih podataka, te nastojimo postići dobru generalizaciju nad stvarnim podatcima \cite{DLBook}. 
 
 \subsection{Unaprijedni potpuno povezani modeli}
 
@@ -107,17 +128,41 @@ Slika \ref{fig:cnn} \cite{NNsvg} prikazuje jednostavni konvolucijski model koji 
 
 \section{Algoritmi podržanog učenja}
 
-Svaki algoritam strojnog učenja definiran modelom, gubitkom i metodom optimizacije. Model je postupak obrade (odnosno skup funkcija) sa slobodnim parametrima koji za određen ulaz daje pripadajući izlaz. Gubitak je mjera koja na formaliziran način vrednuje slobodne parametre modela, odnosno pokazuje u kojoj mjeri se mi ne slažemo s onim što je model predstavio kao izlaz. Metoda optimizacije (optimizacijski postupak) jest način na koji pronalazimo optimalne parametre koji su važni kako bi minimizirali prethodno navedenu komponentu - gubitak. Navedene tri glavne komponente biti će važno napomenuti pri svakom predstavljaju algoritma jer su to glavne odrednice pri analizi algoritama strojnog učenja.
+Način na koji pristupamo problemu pronalaženja optimalne politike prvenstveno ovisi o informacijama koje okolina pruža agentu i o tome je li poznato unutarnje djelovanje okoline - ima li agent pristup modelu okoline (pristup internoj funkciji okoline koja predviđa prijelaze stanja i nagrade). Pritom razlikujemo pristupe koji su temeljeni na modelu - poznaju funkciju predviđanja \engl{model-based methods} i pristupe koji okolinu promatraju kao crnu kutiju i pritom nisu upoznati s njenim pravilima niti principima funkcioniranja \engl{model-free methods}.
 
-TODO dodati dio oko value functions, advantage functions... kako bi bilo kasnije lakše objasniti algoritme, funkcije gubitka, što koja mreža predstavlja...
+Podržano učenje često pokušava riješiti probleme iz svakodnevnog života čiji temeljni model okruženja nije dostupan ili ga je pak teško implementirati. Samim time, nije u potpunosti praktično razmatrati postupke koji se temelje na modelu, koji svoje korake mogu unaprijed planirati i pritom ne zahtijevaju interakciju s okolinom. S druge strane, metode koje u obzir ne uzimaju model moraju jedino znati točnu reprezentaciju stanja okoline i skup akcija koje agent može poduzimati. Gruba podjela algoritama podržanog učenja prikazana je na slici \ref{fig:rl-algorithms}
+
+\begin{figure}[H]
+    \centering
+    \frame{\includegraphics[width=14cm]{assets/rl-algorithms.png}}
+    \caption{Gruba podjela algoritama podržanog učenja \cite{RLAlgos}}
+    \label{fig:rl-algorithms}
+\end{figure}
 
 % https://spinningup.openai.com/en/latest/spinningup/rl_intro2.html
 
 % dodati literaturu https://www.fer.unizg.hr/_download/repository/SU-2020-02-OsnovniKoncepti.pdf
 
+Svaki algoritam strojnog učenja definiran modelom, gubitkom i metodom optimizacije. Model je postupak obrade (odnosno skup funkcija) sa slobodnim parametrima koji za određen ulaz daje pripadajući izlaz. Gubitak je mjera koja na formaliziran način vrednuje slobodne parametre modela, odnosno pokazuje u kojoj mjeri se mi ne slažemo s onim što je model predstavio kao izlaz. Metoda optimizacije (optimizacijski postupak) jest način na koji pronalazimo optimalne parametre koji su važni kako bi minimizirali prethodno navedenu komponentu - gubitak. Navedene tri glavne komponente biti će važno napomenuti pri svakom predstavljaju algoritma jer su to glavne odrednice pri analizi algoritama strojnog učenja.
+
 \subsection{Deep Q Learning}
 
-TODO https://github.com/udacity/deep-learning/blob/master/reinforcement/nature14236.pdf
+Osnovna ideja ovog algoritma jest 
+
+Osnovna ideja ovog algoritma jest naučiti duboki model da za određeno stanje okoline na ulazu, na izlazu generira skup svih akcija i pripadajućih vrijednosti funkcije stanja i akcije (\textit{Q-value}) i pritom izabere akciju s pripadajućom najvećom vrijednošću (najveća vrijednost $Q^*(s, a)$ funkcije). Na taj način
+
+Kako bi optimizirao politiku, agent ima opciju istraživanja novih stanja i maksimiziranja svoje ukupne nagrade. Mora pronaći kompromis između istraživanja (odabira nasumične akcije) \engl{exploration} i odabira akcije s najvećom vrijednošću \engl{exploitation}. Najbolja strategija bila bi uvesti parametar $\epsilon$ koji označava vjerojatnost nasumičnog odabira akcije (umjesto odabira najbolje akcije) kojim bi se model kratkoročno žrtvovao ali sve u svrhu donošenja najbolje cjelokupne odluke u budućnosti. Navedena tehnika naziva se \textit{epsilon-greedy exploration strategy}.
+
+\begin{algorithm}
+\caption{Deep Q-learning with experience replay}
+\label{alg:DQL}
+\begin{algorithmic}
+    
+    \State Inicijaliziraj memoriju $D$ do kapaciteta $N$
+    \State 
+    
+\end{algorithmic}   
+\end{algorithm}
 
 \subsection{Double Deep Q Learning}
 
