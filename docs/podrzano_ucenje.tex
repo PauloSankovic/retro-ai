@@ -7,6 +7,7 @@ Strojno učenje dijeli se na 3 podvrste: nadzirano učenje, nenadzirano učenje 
 Posebna i nama najzanimljivija podvrsta strojnog učenja jest podržano učenje \engl{reinforcement learning}. Podržano učenje bavi se optimizacijom ponašanja agenta koji je u interakciji s okolinom (u kojoj se nalazi) i koji izvršava akcije na temelju informacija koje dobiva iz okoline. Agent pri svakom koraku od okoline dobiva povratnu informaciju u obliku nagrade ili kazne. Za razliku od prethodne dvije navedene podvrste koje mapiraju ulazne podatke na određeni format izlaza, u podržanom učenju je najizraženije učenje iz iskustva koje je čovjeku i drugim živim bićima veoma blisko.
 
 \section{Ključni koncepti}
+\label{chap:kljucni-koncepti}
 
 Za potpuno razumijevanje podržanog učenja, bitno je u navesti i pojasniti ključne koncepte i terminologiju. Okolina \engl{environment} označava svijet u kojem se agent nalazi i s kojim interaktira. Stanje $s_t$ \engl{state} reprezentira kompletni opis okoline u određenom trenutku $t$. S druge strane, opservacija okoline $o_t$ \engl{observation} predstavlja prilagođeni i ograničeni opis okoline koji agent dobije u nekom trenutku. Kada se agent nađe u nekom stanju $s_t$ i kada od okoline dobije opservaciju $o_t$, tada agent poduzima akciju $a_t$ \engl{action} i samim time u idućem vremenskom koraku inicira promjenu stanja $s_{t+1}$ i opservacije okoline $o_{t+1}$. 
 
@@ -34,7 +35,7 @@ Najvažnija i najkorisnija informacija koju agent dobiva od okoline jest nagrada
     r_t = R(s_t, a_t, s_{t+1})
 \end{equation}
 
-Želimo dobiti što bolji pregled koliko su bile dobre akcije koje je agent poduzeo. Tu informaciju možemo predstaviti na dva različita načina. Sumom nekorigiranih nagrada zbrajamo samo nagrade koje su dobivene u fiksnom vremenskom intervalu $T$ (izraz \ref{md:undiscounted-return}). Na taj način dobivamo informaciju o tome kolika je bila prosječna nagrada u zadnjih $T$ koraka. Ako pak želimo pokazati da su nam nagrade u trenutnom stanju vrjednije nego nagrade koje ćemo dobiti u budućim stanjima, moramo uvesti korekcijski faktor $\gamma \in (0,1)$ \engl{discount factor}. Navedeni pristup sumiranja korigiranih nagrada prikazan je izrazom \ref{md:discounted-return}.
+Želimo dobiti što bolji pregled koliko su bile dobre akcije koje je agent poduzeo. Tu informaciju možemo predstaviti na dva različita načina. Sumom nekorigiranih nagrada zbrajamo samo nagrade koje su dobivene u fiksnom vremenskom intervalu $T$ (izraz \ref{md:undiscounted-return}). Na taj način dobivamo informaciju o tome kolika je bila prosječna nagrada u zadnjih $T$ koraka. Ako pak želimo pokazati da su nam nagrade u trenutnom stanju vrjednije nego nagrade koje ćemo dobiti u budućim stanjima, moramo uvesti korekcijski faktor (diskontni faktor) $\gamma \in (0,1)$ \engl{discount factor}. Navedeni pristup sumiranja korigiranih nagrada prikazan je izrazom \ref{md:discounted-return}.
 
 \begin{equation}
     \label{md:undiscounted-return}
@@ -132,6 +133,8 @@ Način na koji pristupamo problemu pronalaženja optimalne politike prvenstveno 
 
 Podržano učenje često pokušava riješiti probleme iz svakodnevnog života čiji temeljni model okruženja nije dostupan ili ga je pak teško implementirati. Samim time, nije u potpunosti praktično razmatrati postupke koji se temelje na modelu, koji svoje korake mogu unaprijed planirati i pritom ne zahtijevaju interakciju s okolinom. S druge strane, metode koje u obzir ne uzimaju model moraju jedino znati točnu reprezentaciju stanja okoline i skup akcija koje agent može poduzimati. Gruba podjela algoritama podržanog učenja prikazana je na slici \ref{fig:rl-algorithms}
 
+%% TODO dodati dio oko on policy i off policy algoritama (učenje s isključenom politikom)
+
 \begin{figure}[H]
     \centering
     \frame{\includegraphics[width=14cm]{assets/rl-algorithms.png}}
@@ -145,24 +148,73 @@ Podržano učenje često pokušava riješiti probleme iz svakodnevnog života č
 
 Svaki algoritam strojnog učenja definiran modelom, gubitkom i metodom optimizacije. Model je postupak obrade (odnosno skup funkcija) sa slobodnim parametrima koji za određen ulaz daje pripadajući izlaz. Gubitak je mjera koja na formaliziran način vrednuje slobodne parametre modela, odnosno pokazuje u kojoj mjeri se mi ne slažemo s onim što je model predstavio kao izlaz. Metoda optimizacije (optimizacijski postupak) jest način na koji pronalazimo optimalne parametre koji su važni kako bi minimizirali prethodno navedenu komponentu - gubitak. Navedene tri glavne komponente biti će važno napomenuti pri svakom predstavljaju algoritma jer su to glavne odrednice pri analizi algoritama strojnog učenja.
 
-\subsection{Deep Q Learning}
+\subsection{Duboko Q učenje}
 
-Osnovna ideja ovog algoritma jest 
+Osnovna inačica algoritma naziva se Q učenje \engl{Q Leaning}. Pripada skupini algoritama s isključenom politikom, jer uči iz akcija koje nisu dio trenutne politike. Algoritam procjenjuje kvalitetu \engl{quality} poduzimanja određene akcije i govori koliko je ona korisna pri dobivanju buduće nagrade. Osnovna inačica algoritma koristi jednostavnu strukturu podataka zvanu Q tablica \engl{Q Table} i pogodna je za korištenje u okolinama s ograničenim i relativno malim brojem stanja i akcija. 
 
-Osnovna ideja ovog algoritma jest naučiti duboki model da za određeno stanje okoline na ulazu, na izlazu generira skup svih akcija i pripadajućih vrijednosti funkcije stanja i akcije (\textit{Q-value}) i pritom izabere akciju s pripadajućom najvećom vrijednošću (najveća vrijednost $Q^*(s, a)$ funkcije). Na taj način
+Q tablica sastoji se od svih mogućih uređenih dvojki $[stanje, akcija]$ i pridruženih vrijednosti (q vrijednosti) koje su prvotno inicijalizirane na $0$. Izgled ove strukture prikazan je na slici \ref{fig:q-learning} (gornja struktura, pridružena algoritmu Q učenja). Učenje se provodi iterativno: odabire se i izvršava akcija koja u trenutnom stanju ima najveću q vrijednost, izračunava se nagrada, i na posljetku, izračunava se nova q vrijednost koristeći Bellmanovu jednadžbu \ref{md:bellman}. Na kraju učenja, q tablica nam zapravo pokazuje koja je najbolja akcija koju možemo poduzeti u određenom stanju.
 
-Kako bi optimizirao politiku, agent ima opciju istraživanja novih stanja i maksimiziranja svoje ukupne nagrade. Mora pronaći kompromis između istraživanja (odabira nasumične akcije) \engl{exploration} i odabira akcije s najvećom vrijednošću \engl{exploitation}. Najbolja strategija bila bi uvesti parametar $\epsilon$ koji označava vjerojatnost nasumičnog odabira akcije (umjesto odabira najbolje akcije) kojim bi se model kratkoročno žrtvovao ali sve u svrhu donošenja najbolje cjelokupne odluke u budućnosti. Navedena tehnika naziva se \textit{epsilon-greedy exploration strategy}.
+Kako bi optimizirao politiku, agent ima opciju istraživanja novih stanja i maksimiziranja svoje ukupne nagrade. Mora pronaći kompromis između istraživanja (odabira nasumične akcije) \engl{exploration} i odabira akcije s najvećom q vrijednošću \engl{exploitation}. Najbolja strategija bila bi uvesti hiperparametar $\epsilon$ koji označava vjerojatnost nasumičnog odabira akcije (umjesto odabira najbolje akcije) kojim bi se model kratkoročno žrtvovao ali sve u svrhu donošenja najbolje cjelokupne odluke u budućnosti. Navedena tehnika naziva se \textit{epsilon-greedy exploration strategy}.
 
-\begin{algorithm}
-\caption{Deep Q-learning with experience replay}
-\label{alg:DQL}
-\begin{algorithmic}
-    
-    \State Inicijaliziraj memoriju $D$ do kapaciteta $N$
-    \State 
-    
-\end{algorithmic}   
-\end{algorithm}
+Uzevši u obzir prethodno navedene činjenice, pri početku treniranja akcije biramo nasumično kako bi agent mogao istražiti okolinu. Daljnjim treniranjem, smanjujemo vrijednost hiperparametra $\epsilon$ i samim time smanjujemo utjecaj strategije nasumičnog istraživanja i povećavamo utjecaj odabira akcije s najvećom q vrijednošću. Na taj način, agent sve više koristi informacije koje je skupio prethodnim istraživanjem. 
+
+%% https://www.assemblyai.com/blog/reinforcement-learning-with-deep-q-learning-explained/
+
+%% TODO literatura za sliku 
+
+\begin{equation}
+    \label{md:bellman}
+    Q(s_t, a_t) = Q(s_t, a_t) + \alpha \left[ r_t + \gamma \max_a Q(s_{t+1}, a) - Q(s_t, a_t) \right]
+\end{equation}
+
+Prikazana Bellmanova jednadžba \ref{md:bellman} iskazuje ukupnu korisnost poduzimanja akcije $a_t$ kada se nalazimo u stanju $s_t$. Sastoji se od nekoliko hiperparametara. Koeficijent $\alpha$ označava stopu učenja \engl{learning rate}, parametar s kojim iskazujemo u kojoj mjeri želimo da nova vrijednost pridonese ukupnom zbroju vrijednosti. Koeficijent $\gamma$ predstavlja korekcijski faktor \engl{discount factor} koji je već predstavljen u poglavlju \nameref{chap:kljucni-koncepti}. Dakle, ažurirana procjena vrijednosti akcije sastoji se od zbroja trenutne procjene i skalirane korekcijske vrijednosti \engl{temporal difference error}. Korekcijska vrijednost je razlika između ciljane vrijednosti q učenja \engl{temporal difference target} te procjene trenutne vrijednosti akcije i u suštini govori u kojoj mjeri se trenutna vrijednost treba ažurirati kako bi smanjili odstupanje između procjene q vrijednosti susjednih stanja. Ukupnu nagradu nastojimo procijeniti zbrojem trenutne nagrade (dobivene izvođenjem akcije $a_t$) i skalirane optimalne vrijednosti buduće akcije (ciljane politike). 
+
+Kao što je već rečeno, algoritam Q učenja pripada skupini algoritama s isključenom politikom i to je upravo vidljivo iz dijela Bellmanove jednadžbe. Pri postupku učenja, neovisno o tome koja se trenutno politika slijedi, pri računanju uzimamo u obzir buduću akciju čija je q vrijednost optimalna. Ta akcija može, ali i ne mora biti dio politike koja se trenutno slijedi. 
+
+%% https://www.youtube.com/watch?v=0iqz4tcKN58
+
+%% http://databookuw.com/databook.pdf
+
+Korištenje q tablica nije pogodno za kompleksne okoline, okoline s velikim brojem stanja i akcija. U takvim okolinama koristi se inačica Q učenja, Duboko Q učenje. Osnovna ideja ovog algoritma jest naučiti duboki model da za određeno stanje okoline na ulazu, generira skup svih akcija i pripadajućih vrijednosti funkcije stanja i akcije, i pritom izabere akciju s pripadajućom najvećom vrijednošću $Q(s, a)$ funkcije \ref{md:action-value-function}. Slika \ref{fig:q-learning} upravo pokazuje tu razliku u korištenim strukturama za generiranje i procjenu vrijednosti funkcije kvalitete.
+
+\begin{figure}[H]
+    \centering
+    \frame{\includegraphics[width=14cm]{assets/q-learning.png}}
+    \caption{Razlika u strukturama koje koriste Q učenje i Duboko Q učenje}
+    \label{fig:q-learning}
+\end{figure}
+
+%% formula funkcije parametrizirane sa parametrima \thau
+
+U procesu učenja koriste se 2 neuronske mreže jednake arhitekture i različitih vrijednosti težina parametara. Razlikujemo neuronsku mrežu koja prati trenutnu politiku \engl{policy neural network} i neuronsku mrežu koja prati ciljanu politiku \engl{target neural network}. Svakih $N$ koraka vrijednosti težina parametara ciljne neuronske mreže zamjenjuju se vrijednostima parametara mreže koja prati trenutnu politiku. Samo treniranje (optimizacija parametara) provodi se nad mrežom koja prati trenutnu politiku. Korištenje dviju neuronski mreža pospješuje stabilnost i učinkovitost procesa učenja. Druga neuronska mreža služi nam pri izračunu ciljane vrijednosti q učenja. Njene parametre ne optimiziramo. Samim time osigurava se da izračun ciljane vrijednosti q učenja bude stabilan, sve dok se njeni parametri zamijene parametrima učene mreže.
+
+Funkciju kvalitete $Q(s, a)$ aproksimirat ćemo neuronskom mrežom. Stoga, prikladno ju je zapisati kao funkciju parametriziranu težinama neuronske mreže, $\theta$ \ref{md:dqn-theta}. Funkcija gubitka \ref{md:dqn-loss} predstavljena je kao razlika između ciljane vrijednosti q učenja (koju aproksimira ciljna neuronska mreža u ovisnosti o njenim težinama $\theta^-$) te procjene trenutne vrijednosti akcije (koju aproksimira trenutna neuronska mreža u ovisnosti o njenim težinama $\theta$).
+
+\begin{equation}
+    \label{md:dqn-theta}
+    Q(s, a) \approx Q(s, a; \theta)
+\end{equation}
+
+\begin{equation}
+    \label{md:dqn-loss}
+    \mathcal{L} = \left[ r_t + \gamma \max_a Q(s_{t+1}, a; \theta^-) - Q(s_t, a_t; \theta) \right]
+\end{equation}
+
+Grupno \engl{batch} učenje pozitivnije utječe na optimizacijski postupak od pojedinačnog učenja, zbog preciznijeg gradijenta. Uzorci za grupu trebali bi biti odabrani slučajnim uzorkovanjem kako bi bili nezavisni (želimo odrediti nepristranu procjenu gradijenta). To nam je motivacija za uvođenje metode ponavljanja iskustva \engl{experience replay}. Pohranjuju se sve akcije, stanja i nagrade koje je agent poduzeo od početka. Konačno, pri svakoj iteraciji postupka učenja, iz liste se izvlači određeni broj uzoraka (grupa).
+
+%% http://www.zemris.fer.hr/~ssegvic/du/du3optimization.pdf
+
+\begin{figure}[H]
+    \centering
+    \frame{\includegraphics[height=8.5cm]{assets/dql-algorithm.png}}
+    \caption{Duboko Q Učenje s ponavljanjem iskustva}
+    \label{fig:dql-algorithm}
+\end{figure}
+
+Algoritam \ref{fig:dql-algorithm} prikazuje pseudokod dubokog q učenja s metodom ponavljanja iskustva koji podrazumijeva dvije neuronske mreže za aproksimaciju q funkcija, zamjenu vrijednosti težina parametara, metodu ponavljanja iskustva, izračun funkcije gubitka. 
+%% TODO ref https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf
+
+%% TODO lista hiperparametra?!?
 
 \subsection{Double Deep Q Learning}
 
