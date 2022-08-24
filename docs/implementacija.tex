@@ -35,6 +35,10 @@ video igranja:
 
 \subsection{Implementacija Actor Critic algoritma}
 
+Intuitively, expected return simply implies that rewards now are better than rewards later. In a mathematical sense, it is to ensure that the sum of the rewards converges.
+
+To stabilize training, the resulting sequence of returns is also standardized (i.e. to have zero mean and unit standard deviation).
+
 \subsection{Usporedba}
 
 \section{Usporedba algoritama}
