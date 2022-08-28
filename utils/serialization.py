@@ -15,6 +15,10 @@ def create_path(base_dir: str, model_name: str, parts: dict) -> Path:
     return DIR / base_dir / "_".join(name_parts)
 
 
+def parts_to_string(**kwargs) -> str:
+    return "_".join([f"{key}={value}" for key, value in kwargs.items()])
+
+
 def save_model(model, base_dir: str = "models", **kwargs) -> None:
     path = create_path(base_dir, model.name, kwargs)
     with open(f"{path}.pickle", "wb") as f:
