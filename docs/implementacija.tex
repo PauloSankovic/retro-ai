@@ -1,7 +1,40 @@
 \chapter{Implementacija}
 
-- inicijalizacija parametara kaiming uniform \\
-- snimanje videa
+Kompletna implementacija napisana je u programskom jeziku \textit{Python} koji je odabran zbog svoje jednostavnosti, sažetosti, fleksibilnosti, neovisnosti o operacijskom sustavu, te velikoj popularnosti. Postoji veliki broj dobro dokumentiranih i iznimno korisnih biblioteka od kojih se za problematiku ovog rada izdvajaju biblioteke za oblikovanje i učenje dubokih modela (\textit{PyTorch}), biblioteka za iznimno brzo i učinkovito provođenje matematičkih operacija (\textit{Numpy}), te biblioteka za jednostavnu interakciju agenata i implementiranih okolina s kojima agent interaktira i dobiva povratnu informaciju (\textit{OpenAI Gym}).
+
+Implementirani su duboki modeli prethodno predstavljenih algoritma dubokog Q učenja, dvostrukog dubokog Q učenja, te prednosnog akter-kritičara. Agenti u svojoj implementaciji interaktiraju s okolinama CartPole i Breakout.
+
+\section{Moduli}
+
+Implementacija je podijeljena u nekoliko modula: modul za generičko instanciranje dubokih modela, modul za generičku serijalizaciju i deserijalizaciju objekata (spremanje i učitavanje agenata), modul za logiranje, modul za \textit{OpenAI Gym} omotače i modul u kojem se nalazi implementacija agenata i algoritama.
+
+\subsection{Instanciranje dubokih modela}
+
+Modul \texttt{networks} sastoji se od metoda i struktura koje omogućuju generičko instanciranje dubokih modela, točnije unaprijednih potpuno povezanih modela i konvolucijskih modela opisanih u poglavlju \nameref{chap:duboki-modeli}. Prilikom poziva metode za instanciranje unaprijedne potpuno povezane mreže kao argument predaje se lista cijelih brojeva koje predstavljaju dimenzije pojedinih slojeva odvojenih nelinearnom aktivacijskom funkcijom ReLU (kao što je prikazano odsječkom \ref{lst:custom-fc}).
+
+\begin{listing}[H]
+    \caption{Generičko instanciranje unaprijedne potpuno povezane mreže}
+    \inputminted{python}{snippets/custom-fc.py}
+    \label{lst:custom-fc}
+\end{listing}
+
+S druge strane, pri instanciranju konvolucijske neuronske mreže, za definiranje atributa konvolucijskog sloja koristi se posebna struktura \texttt{CnnStructure} \ref{lst:cnn-structures} koja definira broj ulaznih i izlaznih kanala, dimenziju jezgre (slobodnih parametara koje učimo), veličinu koraka i nadopunu. Nakon konvolucijskog sloja provodi se sažimanje maksimumom (pritom se smanjuje broj značajki) i provodi nelinearnost aktivacijskom funkcijom ReLU. Na poslijetku, značajke se transformiraju u vektor i prosljeđuju potpuno povezanom sloju. TODO određivanje broja parametara!!!! Generični poziv funkcije za instanciranje konvolucijske neuronske mreže prikazan je odsječkom \ref{custom-cnn}.
+
+\begin{listing}[H]
+    \caption{Generičko instanciranje unaprijedne potpuno povezane mreže}
+    \inputminted{python}{snippets/structures.py}
+    \label{lst:cnn-structures}
+\end{listing}
+
+\subsection{Serijalizacija i deserijalizacija objekata}
+
+\subsection{Logiranje}
+
+\subsection{Omotači}
+
+
+
+
 
 \section{Okolina CartPole}
 

@@ -94,6 +94,7 @@ Dakle, cilj podržanog učenja jest pronaći optimalnu funkciju vrijednosti stan
 \end{figure}
 
 \section{Duboki modeli}
+\label{chap:duboki-modeli}
 
 Duboko učenje \engl{Deep learning} jest tip strojnog učenja (točnije, podskup strojnog učenja) koje nastoji oponašati način zaključivanja i obrasce koje ljudski mozak koristi za učenje i donošenje odluka. Veliku ulogu u cijeloj ideji dubokog učenja imaju duboke neuronske mreže \engl{deep neural networks, DNN} pomoću kojih se povezivanjem više slojeva procesnih elemenata (čvorova, neurona), dobivaju duboki modeli koji su sposobni učiti i baratati s podatcima kompozitne strukture. Primjenom dubokih modela dolazimo do slijeda naučenih nelinearnih transformacija kojima aproksimiramo funkciju odluke, učimo mapiranje između ulaznih podataka i izlazih podataka, te nastojimo postići dobru generalizaciju nad stvarnim podatcima \cite{DLBook}. 
 
@@ -229,7 +230,7 @@ Grupno \engl{batch} učenje pozitivnije utječe na optimizacijski postupak od po
 
 %% http://www.zemris.fer.hr/~ssegvic/du/du3optimization.pdf
 
-Algoritam \ref{fig:dql-algorithm} prikazuje pseudokod dubokog q učenja s metodom ponavljanja iskustva, dvije neuronske mreže za aproksimaciju q funkcija, zamjenu vrijednosti težina parametara, metodu ponavljanja iskustva, izračun funkcije gubitka. 
+Algoritam \ref{fig:dql-algorithm} prikazuje pseudokod dubokog Q učenja s metodom ponavljanja iskustva, dvije neuronske mreže za aproksimaciju Q funkcija, zamjenu vrijednosti težina parametara, metodu ponavljanja iskustva, izračun funkcije gubitka. 
 
 \begin{figure}[H]
     \centering
@@ -287,7 +288,7 @@ Prethodno opisani algoritmi podržanog učenja temeljili su se na aproksimaciji 
 
 \bigskip
 
-Metode zasnovane na politici \engl{policy-based} imaju brojne prednosti: podržavaju stohastičke i determinističke politike, vrlo su učinkoviti u visokodimenzionalnim i kontinuiranim prostorima akcija, te ih karakteriziraju dobra svojstva i izrazito brza konvergencija pod uvjetom korištenja stohastičkog gradijentnog uspona \engl{Stochastic Gradient Ascent} \cite{5. prezza}. U suštini, metode podržanog učenja zasnovane na politici predstavljaju optimizacijski problem. Stohastički gradijentni uspon koristi se zbog ideje maksimiziranja ciljne funkcije politike \engl{policy objective function} $J(\theta)$ definirane izrazom \ref{md:policy-objective-function} koja predstavlja vrijednost očekivanog povrata (kojeg smo izrazom \ref{md:discounted-return} definirali kao sumu diskontiranih nagrada) \cite{https://medium.com/@thechrisyoon/deriving-policy-gradients-and-implementing-reinforce-f887949bd63}. Vrijednost parametara $\theta$ ažurira se u smjeru pozitivnog gradijenta ciljne funkcije politike $J(\theta)$ s korakom učenja $\alpha$ \ref{md:gradient-ascend}. Ažuriranje parametara vrši se na kraju epizode, za razliku od Q učenja gdje su se težine ažurirale na svakom koraku.
+Metode zasnovane na politici \engl{policy-based} imaju brojne prednosti: podržavaju stohastičke i determinističke politike, vrlo su učinkoviti u visokodimenzionalnim i kontinuiranim prostorima akcija, te ih karakteriziraju dobra svojstva i izrazito brza konvergencija pod uvjetom korištenja stohastičkog gradijentnog uspona \engl{Stochastic Gradient Ascent} \cite{5.prezza}. U suštini, metode podržanog učenja zasnovane na politici predstavljaju optimizacijski problem. Stohastički gradijentni uspon koristi se zbog ideje maksimiziranja ciljne funkcije politike \engl{policy objective function} $J(\theta)$ definirane izrazom \ref{md:policy-objective-function} koja predstavlja vrijednost očekivanog povrata (kojeg smo izrazom \ref{md:discounted-return} definirali kao sumu diskontiranih nagrada) \cite{https://medium.com/@thechrisyoon/deriving-policy-gradients-and-implementing-reinforce-f887949bd63}. Vrijednost parametara $\theta$ ažurira se u smjeru pozitivnog gradijenta ciljne funkcije politike $J(\theta)$ s korakom učenja $\alpha$ \ref{md:gradient-ascend}. Ažuriranje parametara vrši se na kraju epizode, za razliku od Q učenja gdje su se težine ažurirale na svakom koraku.
 
 \begin{equation}
     \label{md:policy-objective-function}
@@ -356,7 +357,7 @@ Vrijednost akcije aproksimiramo greškom vremenske razlike \ref{md:advantage-fun
 
 \bigskip
 
-Akter i kritičar su predstavljeni dubokim modelima. Kritičar ažurira parametre $\w$ korištenjem funkcije greške vremenske razlike, dok akter ažurira parametre $\theta$ korištenjem gradijenta politike. Budući da koristimo i aktera i kritičara, ukupna funkcija gubitka izražava se kao zbroj pojedinačnih gubitaka svakog sudionika \ref{md:a2c-loss}. Definirana i opisana funkcija prednosti zajedno s akterovim aproksimacijama vjerojatnosti akcija sudjeluje u maksimiziranju ciljne funkcije politike (odnosno minimiziranju gubitka) i ažuriranju parametara dubokog modela kojim je akter predstavljen \ref{md:a2c-actor-loss} \cite{tensorflow}. Kritičaru želimo da mu je aproksimacija funkcije stanja što bliža stvarnom povratu i zato njegov gubitak predstavljamo izrazom \ref{md:a2c-critic-loss} gdje $L_\delta$ predstavlja huberov gubitak \engl{Hubert loss} \cite{tensorflow}.
+Akter i kritičar su predstavljeni dubokim modelima. Kritičar ažurira parametre $w$ korištenjem funkcije greške vremenske razlike, dok akter ažurira parametre $\theta$ korištenjem gradijenta politike. Budući da koristimo i aktera i kritičara, ukupna funkcija gubitka izražava se kao zbroj pojedinačnih gubitaka svakog sudionika \ref{md:a2c-loss}. Definirana i opisana funkcija prednosti zajedno s akterovim aproksimacijama vjerojatnosti akcija sudjeluje u maksimiziranju ciljne funkcije politike (odnosno minimiziranju gubitka) i ažuriranju parametara dubokog modela kojim je akter predstavljen \ref{md:a2c-actor-loss} \cite{tensorflow}. Kritičaru želimo da mu je aproksimacija funkcije stanja što bliža stvarnom povratu i zato njegov gubitak predstavljamo izrazom \ref{md:a2c-critic-loss} gdje $L_\delta$ predstavlja huberov gubitak \engl{Hubert loss} \cite{tensorflow}.
 
 \begin{equation}
     \label{md:a2c-loss}
@@ -375,7 +376,7 @@ Akter i kritičar su predstavljeni dubokim modelima. Kritičar ažurira parametr
 
 \bigskip
 
-Pseudokod A2C algoritma prikazan je slici \ref{fig:a2c-algorithm}. Dobivena nagrada, vjerojatnost akcija i vrijednost stanja pamte se sve do kraja epizode ili trenutka definiranog parametrom $t_{max}$ kada se izračunavaju funkcije gubitka i ažuriraju parametri dubokih modela \cite{A2C}.
+Pseudokod \textit{A2C} algoritma prikazan je slici \ref{fig:a2c-algorithm}. Dobivena nagrada, vjerojatnost akcija i vrijednost stanja pamte se sve do kraja epizode ili trenutka definiranog parametrom $t_{max}$ kada se izračunavaju funkcije gubitka i ažuriraju parametri dubokih modela \cite{A2C}.
 
 \begin{figure}[H]
     \centering

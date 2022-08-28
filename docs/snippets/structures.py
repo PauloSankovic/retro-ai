@@ -1,0 +1,3 @@
+class CnnStructure:
+    def __init__(self, in_channels: int, out_channels: int, kernel_size: int, stride: int, padding: int = 0):
+        ...
