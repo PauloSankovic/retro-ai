@@ -7,7 +7,7 @@ import numpy as np
 from collections import deque, namedtuple
 import random
 
-from pytorch_wrappers import PytorchLazyFrames
+from wrappers.pytorch_wrappers import PytorchLazyFrames
 
 Transition = namedtuple('Transition', ('state', 'action', 'done', 'next_state', 'reward'))
 
