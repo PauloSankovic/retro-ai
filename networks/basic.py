@@ -34,6 +34,7 @@ def cnn(observation_space, cnn_structure: list[CnnStructure], fc_hidden_dims: li
         )
 
         cnn_layers.append(conv)
+        cnn_layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
         if i != len(cnn_structure) - 1:
             cnn_layers.append(nn.ReLU())
 
