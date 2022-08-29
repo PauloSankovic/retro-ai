@@ -6,7 +6,7 @@ import random
 
 from torch.utils.tensorboard import SummaryWriter
 
-from playground.agents import ReplayMemory, DeepQNetworkAgent
+from playground.agents import ReplayMemory, DeepQNetworkAgent, DoubleDeepQNetworkAgent
 from networks import fc
 
 from utils import save_state_dict, parts_to_string
@@ -17,18 +17,18 @@ ALPHA = 5e-4
 GAMMA = 0.99
 BATCH_SIZE = 32
 # maximum number of transitions we store before overwriting old transitions
-BUFFER_SIZE = 1_000_000
+BUFFER_SIZE = 50_000
 # how many transitions we want in replay buffer
 # before we start calculating gradients and training
 MIN_REPLAY_SIZE = 1000
 EPSILON_START = 1.0
 EPSILON_END = 0.02
 # decay period
-EPSILON_DECAY = 1_000_000
+EPSILON_DECAY = 10_000
 # number of steps where we set the target parameters equal to the online parameters
 TARGET_UPDATE_FREQ = 1000
 # summary writer directory
-LOG_DIR = '../summary/dqn-v3/' + parts_to_string(net='dqn', lr='5e-4', bs='32', es='1', ee='0.02', ed='10000')
+LOG_DIR = '../summary/cartpole/' + parts_to_string(net='ddqn', lr='5e-4', bs='32', es='1', ee='0.02', ed='10000')
 # logging interval
 LOG_INTERVAL = 1_000
 # model parameters saving interval
@@ -88,11 +88,11 @@ if __name__ == '__main__':
             cumulative_reward = 0.05 * episode_reward + 0.95 * cumulative_reward
             episode_reward = 0
 
-        # if cumulative_reward > 1000:
-        #     print(f"Solved after {step} steps -> {cumulative_reward}")
-        #     save_state_dict(online_net, env='breakout-ram', step=str(step), lr='5e-4', bs='32', es='1', ee='0.02',
-        #                     ed='10000')
-        #     break
+        if cumulative_reward > 1000:
+            print(f"Solved after {step} steps -> {cumulative_reward}")
+            save_state_dict(online_net, env='breakout-ram', step=str(step), lr='5e-4', bs='32', es='1', ee='0.02',
+                            ed='10000')
+            break
 
         transitions = replay_memory.sample(BATCH_SIZE)
         loss = online_net.loss(transitions, target_net, GAMMA)
@@ -120,7 +120,7 @@ if __name__ == '__main__':
 
             losses = []
 
-        if step % SAVE_INTERVAL == 0 and step != 0:
-            print("Saving")
-            save_state_dict(online_net, env='breakout-ram', step=str(step), lr='5e-4', bs='32', es='1', ee='0.02',
-                            ed='10000')
+        # if step % SAVE_INTERVAL == 0 and step != 0:
+        #     print("Saving")
+        #     save_state_dict(online_net, env='cartpole', step=str(step), lr='5e-4', bs='32', es='1', ee='0.02',
+        #                     ed='10000')
