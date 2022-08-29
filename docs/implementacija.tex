@@ -6,7 +6,7 @@ Implementirani su duboki modeli prethodno predstavljenih algoritma dubokog Q uč
 
 \section{Moduli}
 
-Implementacija je podijeljena u nekoliko modula: modul za generičko instanciranje dubokih modela, modul za generičku serijalizaciju i deserijalizaciju objekata (spremanje i učitavanje agenata), modul za logiranje, modul za \textit{OpenAI Gym} omotače i modul u kojem se nalazi implementacija agenata i algoritama.
+Implementacija je podijeljena u nekoliko modula: modul za generičko instanciranje dubokih modela, modul za generičku serijalizaciju i deserijalizaciju objekata (spremanje i učitavanje agenata), modul za \textit{OpenAI Gym} omotače i modul u kojem se nalazi implementacija agenata i algoritama.
 
 \subsection{Instanciranje dubokih modela}
 
@@ -18,25 +18,131 @@ Modul \texttt{networks} sastoji se od metoda i struktura koje omogućuju generi�
     \label{lst:custom-fc}
 \end{listing}
 
-S druge strane, pri instanciranju konvolucijske neuronske mreže, za definiranje atributa konvolucijskog sloja koristi se posebna struktura \texttt{CnnStructure} \ref{lst:cnn-structures} koja definira broj ulaznih i izlaznih kanala, dimenziju jezgre (slobodnih parametara koje učimo), veličinu koraka i nadopunu. Nakon konvolucijskog sloja provodi se sažimanje maksimumom (pritom se smanjuje broj značajki) i provodi nelinearnost aktivacijskom funkcijom ReLU. Na poslijetku, značajke se transformiraju u vektor i prosljeđuju potpuno povezanom sloju. TODO određivanje broja parametara!!!! Generični poziv funkcije za instanciranje konvolucijske neuronske mreže prikazan je odsječkom \ref{custom-cnn}.
+S druge strane, pri instanciranju konvolucijske neuronske mreže, za definiranje atributa konvolucijskog sloja koristi se posebna struktura \texttt{CnnStructure} \ref{lst:cnn-structures} koja definira broj ulaznih i izlaznih kanala, dimenziju jezgre (slobodnih parametara koje učimo), veličinu koraka i nadopunu. Nakon konvolucijskog sloja provodi se nelinearnost aktivacijskom funkcijom ReLU. Na posljetku, značajke se transformiraju u vektor i prosljeđuju potpuno povezanom sloju. Pri prijelazu iz konvolucijskog sloja u potpuno povezani sloj, potrebno je točno izračunati broj parametara koji se prenose iz jednog sloja u drugi. Umjesto iscrpnog računanja, broj parametara je određen tako da se napravio jedan unaprijedni prolaz kroz definirane konvolucijske slojeve. Generični poziv funkcije za instanciranje konvolucijske neuronske mreže prikazan je odsječkom \ref{lst:custom-cnn}. 
 
 \begin{listing}[H]
-    \caption{Generičko instanciranje unaprijedne potpuno povezane mreže}
+    \caption{Struktura za definiranje atributa konvolucijskog sloja}
     \inputminted{python}{snippets/structures.py}
     \label{lst:cnn-structures}
 \end{listing}
 
-\subsection{Serijalizacija i deserijalizacija objekata}
+Svi parametri konvolucijskog i potpuno povezanog sloja inicijalizirani su koristeći Kaiming uniformnu distribuciju koja u obzir uzima funkciju nelinearnosti koju koristimo.
 
-\subsection{Logiranje}
+\begin{listing}[H]
+    \caption{Generičko instanciranje konvolucijske neuronske mreže}
+    \inputminted{python}{snippets/custom-cnn.py}
+    \label{lst:custom-cnn}
+\end{listing}
+
+\subsection{Serijalizacija i deserijalizacija agenata}
+
+Modul \texttt{serialization} sadrži metode za učitavanje i spremanje \textit{Python} objekata, točnije serijalizaciju objekata u tok okteta podataka \engl{byte stream} i njegovu deserijalizaciju. Za samo spremanje koriste se pomoćne funkcije biblioteke \textit{PyTorch} (\texttt{torch.save} i \texttt{torch.load}) koje u internoj implementaciji koriste biblioteku za serijalizaciju i deserijalizaciju - \textit{Pickle}. U implementaciji koristimo navedene funkcionalnosti kako bi sačuvali i učitali parametre naučenih dubokih modela. 
 
 \subsection{Omotači}
 
+Prema uzoru na biblioteku \textit{Stable Baselines3} i članke koji opisuju dobre i kvalitetne pristupe pri rješavanju problema podržanog učenja \cite{DQL}, modul \texttt{wrappers} sadrži zbirku implementiranih \textit{OpenAI Gym} omotača. Svi korišteni omotači prilagođeni su uporabi na \textit{Atari} okolinama. Ideja je da originalnu okolinu omotamo u strukture koje omogućavaju izmjenu elemenata postojećeg okruženja bez potrebe za mijenjanjem originalnog koda. Omotač \texttt{WarpFrame} koristeći biblioteku \textit{cv2} (\textit{OpenCV}) skalira sliku okoline na okvir dimenzija $84 \times 84$ i pretvara RGB vrijednosti piksela u nijanse sive boje \engl{grayscale}, kao što je i prikazano na slici \ref{fig:warp-frame}.
 
+\begin{figure}[H]
+    \centering
+    \frame{\includegraphics[width=8cm]{assets/warp-frame.png}}
+    \caption{Breakout okoline prije i nakon korištenja omotača \texttt{WarpFrame}}
+    \label{fig:warp-frame}
+\end{figure}
 
+Obratimo pažnju ponovno na prikaz \ref{fig:warp-frame}. Dimenzije (širina - $W$, visina - $H$ i broj kanala - $C$) slike lijevo su $160 \times 210 \times 3$ a slike desno $84 \times 84 \times 1$. Iz razloga što okolina vraća slike u dimenziji $H \times W \times C$, a \textit{PyTorch} konvolucijski sloj prima dimenzije oblike $C \times H \times W$, napravljen je posebni omotač \texttt{TransposeImageObs} koji uređuje dimenzije.
 
+Omotači mogu poslužiti i za ugrađivanje stohastike u atari okruženjima kao što je i opisano u poglavlju \ref{chap:determinizam}. Omotač \texttt{NoopResetEnv} osigurava da na početku epizode okolina ignorira akcije agenta (tehnika \textit{initial no-ops}). Omotač \texttt{MaxAndSkipEnv} provodi tehniku \textit{frame skipping} i $n$ puta vraća istu povratnu informaciju agentu. 
+
+Od ostalih korisnih omotača, bitno je spomenuti omotač \texttt{ClipRewardEnv} ograničava nagrade okoline na vrijednosti $ \{ -1, 0, 1 \} $, \texttt{FireResetEnv} koji na početku epizode izvršava operaciju \texttt{FIRE}, \texttt{BatchedPytorchFrameStack} koji u kombinaciji s \texttt{SubprocVecEnv} osigurava istovremeno izvođenje nekoliko instanci okruženja koristeći biblioteku \textit{multiprocessing} \cite{SB3}.
+
+\section{Implementacijski detalji}
+
+\subsection{Duboko Q učenje}
+
+Na samom početku izvođenja algoritma potrebno je napuniti spremnik za ponavljanje $D$ i u njega pohraniti sve akcije, stanja i nagrade koje je agent poduzeo od početka. Iz tog razloga korisno je napraviti strukturu koja predstavlja uređenu $n$-torku \texttt{Transition} i razred \texttt{ReplayMemory} kao što je prikazano kodom \ref{lst:replay-memory}. Razred interno za pohranu koristi kolekciju \texttt{deque} \engl{Doubly Ended Queue} koji se više preferira od listi zbog bržih operacija unosa i brisanja s početka i kraja reda. Kapacitet spremnika za ponavljanje određen je parametrom \texttt{capacity}. Razred sadrži metode za ubacivanje podataka i nasumično uzorkovanje određenog broja prijelaza.
+
+\begin{listing}[H]
+    \caption{Instanciranje neuronskih mreža}
+    \inputminted{python}{snippets/replay-memory.py}
+    \label{lst:replay-memory}
+\end{listing}
+
+Slijedi instanciranje dviju neuronskih mreža: mreže koja prati trenutnu politiku i provodi stalno ažuriranje parametara \texttt{online_net} (s parametrima $\theta$), i mreže koja prati ciljanu politiku \texttt{target_net} (s parametrima $\theta^-$). Nakon instanciranja, obje mreže trebaju imati jednaku vrijednost parametara. Navedeno je prikazano odsječkom koda \ref{lst:dqn-nets}.
+
+\begin{listing}[H]
+    \caption{Struktura spremnika za ponavljanje}
+    \inputminted{python}{snippets/dqn-nets.py}
+    \label{lst:dqn-nets}
+\end{listing}
+
+U svakom koraku potrebno je odabrati iduću akciju koju će agent poduzeti. Provodimo tehniku istraživanja (pritom odabiremo nasumičnu akciju) i odabira akcije s najvećom Q vrijednošću (potencijalno najkorisniju akciju). Opisana strategija \textit{epsilon-greedy exploration} prikazana je kodom \ref{lst:dqn-actions}.
+
+\begin{listing}[H]
+    \caption{Implementacija \textit{epsilon-greedy exploration} strategije}
+    \inputminted{python}{snippets/dqn-actions.py}
+    \label{lst:dqn-actions}
+\end{listing}
+
+Gubitak se izračunava postupkom \ref{lst:dqn-loss} prema formuli \ref{md:dqn-loss}. Prvo se provodi unaprijedni prolaz nad mrežom \texttt{target_net} i pritom se dobivaju vrijednosti $Q(s_{t+1}, a; \theta^-)$. Računa se njihova maksimalna vrijednost i skalira hiperparametrom \texttt{gamma}. Provodi se unaprijedni prolaz nad mrežom \texttt{online_net} (vrijednosti $Q(s_t, a_t; \theta)$) i od prikupljenih vrijednosti računa huberov gubitak za kojeg se pokazalo da je bolji od srednje kvadratne pogreške \engl{Mean Squared Error} zbog manje osjetljivosti na odustupanja \engl{outliers}. Nakon izračuna gubitka, provodi se izračun gradijenta i ažuriranje parametara \texttt{online_net} mreže. Nakon što prođe određeni broj koraka, provodi se zamjena vrijednosti parametara, odnosno ažuriranje parametara \texttt{target_net} mreže.
+
+\begin{listing}[H]
+    \caption{Izračun gubitka dubokog Q učenja}
+    \inputminted{python}{snippets/dqn-loss.py}
+    \label{lst:dqn-loss}
+\end{listing}
+
+\subsection{Dvostruko duboko Q učenje}
+
+Algoritam dvostrukog dubokog Q učenja rješava problem precjenjivanja vrijednosti funkcije akcije. Razlika između njega i algoritma dubokog Q učenja očituje se u izrazu i računanju funkcije gubitka \ref{md:ddqn-loss}. Upravo to je bio i cilj - riješiti problem precjenjivanja pritom ne mijenjajući osnovni kostur algoritma. Prema algoritmu, izračun funkcije gubitka počinje unaprijednim prolazom kroz \texttt{online_net} mrežu i dobivanjem vrijednosti $Q(s_{t+1}, a, \theta)$. Nad dobivenom vrijednostima provodimo operaciju $\argmax$ - uzimamo najveće Q vrijednosti i zapamtimo akcije kojima su one pridružene. Nad \texttt{target_net} mrežom računamo unaprijedni prolaz i Q vrijednosti izračunate s parametrima $\theta^-$ pridružujemo ranije zapamćenim akcijama. Daljnje računanje istovjetno je postupcima u dubokom Q učenju - izračun $Q(s_t, a_t; \theta)$, huberovog gubitka, gradijenta i ažuriranje parametara $\theta$ \texttt{target_net} mreže 
+
+\begin{listing}[H]
+    \caption{Izračun gubitka dvostrukog dubokog Q učenja}
+    \inputminted{python}{snippets/ddqn-loss.py}
+    \label{lst:ddqn-loss}
+\end{listing}
+
+\subsection{Prednosni akter-kritičar}
+
+Implementacija prednosnog akter-kritičar algoritma započinje konstruiranjem dubokog modela s idejom da i akter i kritičar dijele sve slojeve iste neuronske mreže osim posljednjeg sloja. Dimenzija izlaznog sloja aktera odgovara broju akcija koje su akteru na raspolaganju u određenoj okolini, dok istovremeno kritičar ima samo jedan izlaz koji odgovara procjeni funkcije stanja. Odsječak koda \ref{lst:a2c-net} prikazuje inicijalizaciju potpuno povezanog dubokog modela s dva različita izlazna sloja.
+
+\begin{listing}[H]
+    \caption{Inicijalizacija potpuno povezanog dubokog modela algoritma akter-kritičar}
+    \inputminted{python}{snippets/a2c-net.py}
+    \label{lst:a2c-net}
+\end{listing}
+
+Prilikom unaprijednog prolaza, potrebno je prvo izračunati izlaz iz zajedničkog dijela mreže i potom rezultat provući kroz sloj aktera i sloj kritičara. Akter izračunava vjerojatnost poduzimanja akcija, dok kritičar procjenjuje funkciju stanja. Odsječak unaprijednog prolaza prikazan je kodom \ref{lst:a2c-forward}.
+
+\begin{listing}[H]
+    \caption{Unaprijedni prolaz algoritma akter-kritičar}
+    \inputminted{python}{snippets/a2c-forward.py}
+    \label{lst:a2c-forward}
+\end{listing}
+
+Pri svakoj iteraciji potrebno je odrediti akciju koju će izvršiti agent. Taj odabir akcije prikazan je kodom \ref{lst:a2c-action}. Unaprijednim prolazom mreže dobijemo vjerojatnost poduzimanja svake od mogućih akcija i vrijednost funkcije stanja. Agent će poduzeti akciju koja ima najveću vjerojatnost. Dobivena nagrada, vjerojatnost akcija i vrijednost stanja pohranjuju se sve do kraja epizode kada se provodi evaluacija, izračunava gubitak, provodi izračun gradijenata i ažuriranje parametara.
+
+\begin{listing}[H]
+    \caption{Odabir akcije i pohrana podataka za evaluaciju algoritma \textit{A2C}}
+    \inputminted{python}{snippets/a2c-action.py}
+    \label{lst:a2c-action}
+\end{listing}
+
+Konačno, na kraju epizode provodi se postupak evaluacije prikupljenog znanja \ref{lst:a2c-eval}. Prvo za svaki korak izračunavamo diskontni povrat od stanja $t$ pa sve do kraja epizode (vrijednost $R_t$). Slijedi računanje gubitka. Za svaku iteraciju izračunava se funkcija prednosti \ref{md:advantage-function-with-return}. Funkcija prednosti je razlika izračunatih diskontnih povrata i procjene funkcije stanja koju je kritičar procijenio prilikom poduzimanja svake akcije \ref{lst:a2c-action}. Nadalje, gubitak aktera i kritičara računa se prema izrazima \ref{md:a2c-actor-loss} i \ref{md:a2c-critic-loss}. Gubitci se zbroje, provede se izračun gradijenata i ažuriranje parametara dubokog modela.
+
+\begin{listing}[H]
+    \caption{Evaluacija aktera i kritičara u algoritmu \textit{A2C}}
+    \inputminted{python}{snippets/a2c-eval.py}
+    \label{lst:a2c-eval}
+\end{listing}
 
 \section{Okolina CartPole}
+
+
+
+- učenje na grafičkoj xx
+- prikaz grafa i opis (sve na istom grafu)
+- zaključak sa slike
+- korišteni parametri
 
 \subsection{Implementacija Deep Q Learning algoritma}
 

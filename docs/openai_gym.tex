@@ -37,7 +37,7 @@ Osnovna struktura okruženja opisana je atributima \texttt{observation_space} i 
 
 Format validnih akcija i stanja okoline, odnosno struktura tih podataka, definirana je razredima \texttt{Box}, \texttt{Discrete}, \texttt{MultiBinary} i \texttt{MultiDiscrete}. Svi navedeni razredi nasljeđuju i implementiraju glavne metode nadrazreda \texttt{Space}. 
 
-Razred \texttt{Box} predstavlja strukturu podataka u kontinuiranom $n$-dimenzionalnom prostoru. Prostor i njegove validne vrijednosti omeđene su gornjim i donjim granicama koje se jednostavno postave pri inicijalizaciji strukture pridruživanjem željenih vrijednosti atributima \texttt{high} i \texttt{low}. Kod \ref{lst:box-code} prikazuje inicijalizaciju \texttt{Box} strukture podataka koja je sastavljena od $3$-dimenzionalnog vektora čije su vrijednosti omeđene odozdo i odozgo vrijednostima $-1$ i $-2$. Metoda \texttt{sample(self)} nasumično uzorkuje element iz prostora koristeći različite distribucije ovisno o ograničenjima prostora.
+Razred \texttt{Box} predstavlja strukturu podataka u kontinuiranom $n$-dimenzionalnom prostoru. Prostor i njegove validne vrijednosti omeđene su gornjim i donjim granicama koje se jednostavno postave pri inicijalizaciji strukture pridruživanjem željenih vrijednosti atributima \texttt{high} i \texttt{low} \cite{GymStart}. Kod \ref{lst:box-code} prikazuje inicijalizaciju \texttt{Box} strukture podataka koja je sastavljena od $3$-dimenzionalnog vektora čije su vrijednosti omeđene odozdo i odozgo vrijednostima $-1$ i $-2$. Metoda \texttt{sample(self)} nasumično uzorkuje element iz prostora koristeći različite distribucije ovisno o ograničenjima prostora.
 
 \begin{listing}[H]
     \caption{Primjer korištenja strukture kontinuiranog prostora \texttt{Box}}
@@ -55,13 +55,13 @@ Razred \texttt{Discrete} s druge strane, predstavlja strukturu podataka u diskre
 
 \subsection{Omotači}
 
-Omotači \engl{Wrappers} su prikladne strukture koje omogućavaju izmjenu elemenata postojećeg okruženja bez potrebe za mijenjanjem originalnog koda. Omotači omogućavaju modularnost, mogu se implementirati prema vlastitim potrebama i ulančavati. Ova funkcionalnost vrlo se često koristi u situacijama kada pri treniranju modela želimo normalizirati ulaze (skalirati vrijednosti slikovnih jedinica), provesti regularizaciju (podrezivanje vrijednosti nagrade), transformirati ulaze u \textit{PyTorch} dimenzije, implementirati metodu preskakanja slikovnih okvira...  Navedene funkcionalnosti moguće je postići tako da definiramo vlastiti omotač koji će nasljeđivati ili obični \texttt{Wrapper} nadrazred ili specifičnije razrede poput \texttt{ObservationWrapper}, \texttt{RewardWrapper}, \texttt{ActionWrapper}...
+Omotači \engl{Wrappers} su prikladne strukture koje omogućavaju izmjenu elemenata postojećeg okruženja bez potrebe za mijenjanjem originalnog koda. Omotači omogućavaju modularnost, mogu se implementirati prema vlastitim potrebama i ulančavati \cite{GymStart}. Ova funkcionalnost vrlo se često koristi u situacijama kada pri treniranju modela želimo normalizirati ulaze (skalirati vrijednosti slikovnih jedinica), provesti regularizaciju (podrezivanje vrijednosti nagrade), transformirati ulaze u \textit{PyTorch} dimenzije, implementirati metodu preskakanja slikovnih okvira...  Navedene funkcionalnosti moguće je postići tako da definiramo vlastiti omotač koji će nasljeđivati ili obični \texttt{Wrapper} nadrazred ili specifičnije razrede poput \texttt{ObservationWrapper}, \texttt{RewardWrapper}, \texttt{ActionWrapper}...
 
 \subsection{Vektorizirana okruženja}
 
 Koristeći standardne metode stvaranja i interakcije s Gym okruženjem, pokrećemo samo jednu instancu okruženja i na taj način ne iskorištavamo računalnu snagu koja nam je dostupna u potpunosti. Vektorizirana okruženja \engl{Vectorized environments} su okruženja koja paralelno pokreću više kopija istog okruženja u svrhu poboljšanja učinkovitosti i ubrzanja procesa učenja agenta i njegove interakcije s kopijama okolina.
 
-\textit{Python} biblioteka \textit{stable-baselines} \cite{BaselinesVecEnvs} pruža gotove omotače koji omogućavaju pokretanje $n$ paralelnih neovisnih instanci okolina. Paralelna obrada interno je implementirana korištenjem \textit{multiprocessing} paketa. Zbog paralelne interakcije agenta s više okolina potrebno je prilagoditi strukturu objekata. Agent predaje omotanoj okolini niz od $n$ akcija i dobiva listu povratnih informacija (stanje pojedinačne okoline, nagrada i zastavica terminalnog stanja) u formi liste $n$ vrijednosti.
+\textit{Python} biblioteka \textit{Stable Baselines3} \cite{BaselinesVecEnvs} pruža gotove omotače koji omogućavaju pokretanje $n$ paralelnih neovisnih instanci okolina. Paralelna obrada interno je implementirana korištenjem \textit{multiprocessing} paketa. Zbog paralelne interakcije agenta s više okolina potrebno je prilagoditi strukturu objekata. Agent predaje omotanoj okolini niz od $n$ akcija i dobiva listu povratnih informacija (stanje pojedinačne okoline, nagrada i zastavica terminalnog stanja) u formi liste $n$ vrijednosti.
 
 \begin{figure}[H]
     \centering
@@ -71,6 +71,7 @@ Koristeći standardne metode stvaranja i interakcije s Gym okruženjem, pokreće
 \end{figure}
 
 \section{Determinizam atari okruženja}
+\label{chap:determinizam}
 
 Upravljanje agentima i njihovo izvođenje akcija u određenoj atari okolini interno je implementirano koristeći objektno orijentiranu razvojnu cjelinu \engl{framework} \textit{The Arcade Learning Environment} (skraćeno \textit{ALE}). Na taj način razdvajaju se slojevi emulacije okruženja (koristeći Atari 2600 emulator \textit{Stella}), sloj koji kontrolira samog agenta \textit{(ALE)} i sloj koji pruža jednostavnu programsku implementaciju i interakciju \textit{(OpenAI Gym)} \cite{OpenAIALE}. 
 
@@ -80,7 +81,7 @@ Originalna Atari 2600 konzola nije imala izvor entropije za generiranje pseudosl
 
 Tehnika \textit{random action noise} zamjenjuje odabranu akciju agenta nasumičnom akcijom samo ako je vjerojatnost zamjene manja od specificirane vrijednosti. Ovo uspješno uvođenje stohastike dolazi s negativnim posljedicama poduzimanja slučajne akcije koja može značajno poremetiti politiku agenta i smanjiti učinak \cite{AleDeterministic}. Odabir slučajne akcije bolje je zamijeniti pristupom ponavljanja prethodno odabrane akcije uzimajući u obzir parametar vjerojatnosti zamjene akcije - \textit{stickiness}. Riječ je o \textit{sticky actions} pristupu koji uvodi stohastiku, te ne ometa odabir akcije agenta koji može biti siguran da njegove akcije neće biti pogubne za ostatak iterakcije s okolinom.
 
-Pristupi \textit{sticky actions} i \textit{frame skipping} dio su \textit{OpenAI Gym} biblioteke i mogu se specificirati prilikom instanciranja okoline, dok je \textit{random action noise} i \textit{initial no-ops} tehnike potrebno manualno implementirati ili se osloniti na izvedbu u poznatim \textit{Python} bibliotekama poput \textit{stable-baselines3}.
+Pristupi \textit{sticky actions} i \textit{frame skipping} dio su \textit{OpenAI Gym} biblioteke i mogu se specificirati prilikom instanciranja okoline, dok je \textit{random action noise} i \textit{initial no-ops} tehnike potrebno manualno implementirati ili se osloniti na izvedbu u poznatim \textit{Python} bibliotekama poput \textit{Stable Baselines3}.
 
 \section{Okruženja}
 
@@ -133,7 +134,7 @@ Početno stanje okoline inicijalizira se pozivom metode \texttt{reset()} slučaj
 
 \subsection{Okruženje Breakout}
 
-Ova okolina simulira poznatu Atari 2600 igru u kojoj je cilj sakupiti što više bodova pomičući platformu i održavajući lopticu na ekranu. Platforma je postavljena na dnu ekrana, na fiksnoj visini i moguće ju je pomicati u dva smjera. Loptica se odbija između zidova, platforme i 6 razina \textit{ciglenih} blokova čijim razbijanjem se sakupljaju bodovi. Ako loptica padne ispod platforme koju igrač kontrolira, gubi se život. Igra završava kada igrač potroši 5 života, odnosno kada 5 puta loptica padne ispod platforme. 
+Ova okolina simulira poznatu Atari 2600 igru u kojoj je cilj sakupiti što više bodova pomičući platformu i održavajući lopticu na ekranu. Platforma je postavljena na dnu ekrana, na fiksnoj visini i moguće ju je pomicati u dva smjera. Loptica se odbija između zidova, platforme i 6 razina \textit{ciglenih} blokova čijim razbijanjem se sakupljaju bodovi. Ako loptica padne ispod platforme koju igrač kontrolira, gubi se život. Igra završava kada igrač potroši 5 života, odnosno kada 5 puta loptica padne ispod platforme \cite{AtariBreakout}. 
 
 Skup validnih akcija je instanca razreda \texttt{Discrete(4)} - skup akcija je diskretan i u svakom koraku je moguće odabrati 1 od maksimalno 4 dostupne akcije. Opis značenja svake akcije prikazan je u tablici \ref{table:breakout-action}. Kao opis trenutnog stanja okoline moguće je dobiti RGB vrijednosti svakog piksela slike (slike dimenzije $210 \times 160$) ili vrijednosti radne memorije \textit{ALE} okoline (128 bajta) - što je korisno jer možemo preskočiti korak učenja reprezentacije okoline (preskačemo dio gdje algoritmi učenja moraju iz piksela slike naučiti reprezentaciju). Razlike u strukturi objekta okoline prikazane su u tablici \ref{table:breakout-observation}. 
 
@@ -175,12 +176,3 @@ Nagrada dolazi u obliku bodova koji se dobivaju uništavajući \textit{ciglene} 
     \caption{Izgled Breakout okoline}
     \label{fig:breakout}
 \end{figure}
-
-
-% TODO dodati za literaturu https://blog.paperspace.com/getting-started-with-openai-gym/ i https://www.gymlibrary.ml/content/vector_api/ i https://www.gymlibrary.ml/ općenito
-
-% TODO dodati za literaturu https://atariage.com/manual_html_page.php?SoftwareID=889
-
-% značenje pojedinih ram pozicija https://github.com/mila-iqia/atari-representation-learning/blob/master/atariari/benchmark/ram_annotations.py
-
-% https://stackoverflow.com/questions/45207569/how-to-interpret-the-observations-of-ram-environments-in-openai-gym
