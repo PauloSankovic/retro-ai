@@ -3,10 +3,10 @@ from torch.utils.tensorboard import SummaryWriter
 import numpy as np
 import itertools
 
-from baselines_wrappers import DummyVecEnv, SubprocVecEnv, Monitor
+from wrappers import SubprocVecEnv, Monitor
+from wrappers.pytorch_wrappers import make_atari_deepmind, PytorchLazyFrames, BatchedPytorchFrameStack
 from playground.agents.dqnAgent import DeepQNetworkAgent, ReplayMemory
-from playground.networks import cnn, CnnStructure
-from pytorch_wrappers import make_atari_deepmind, PytorchLazyFrames, BatchedPytorchFrameStack
+from networks import cnn, CnnStructure
 
 from utils import save_state_dict
 

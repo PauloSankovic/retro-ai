@@ -7,7 +7,7 @@ import numpy as np
 from collections import deque, namedtuple
 import random
 
-from pytorch_wrappers import PytorchLazyFrames
+from wrappers.pytorch_wrappers import PytorchLazyFrames
 
 Transition = namedtuple('Transition', ('state', 'action', 'done', 'next_state', 'reward'))
 
@@ -73,7 +73,6 @@ class DeepQNetworkAgent(nn.Module):
         else:
             states = np.asarray(states)
             next_states = np.asarray(next_states)
-
 
         states = torch.tensor(states, device=self.device)
         actions = torch.tensor(actions, device=self.device, dtype=torch.int64).unsqueeze(-1)
