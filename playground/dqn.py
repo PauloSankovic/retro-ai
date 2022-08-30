@@ -28,7 +28,7 @@ EPSILON_DECAY = 10_000
 # number of steps where we set the target parameters equal to the online parameters
 TARGET_UPDATE_FREQ = 1000
 # summary writer directory
-LOG_DIR = '../summary/cartpole/' + parts_to_string(net='ddqn', lr='5e-4', bs='32', es='1', ee='0.02', ed='10000')
+LOG_DIR = '../summary/cartpole/' + parts_to_string(net='dqn', v='2', lr='5e-4', bs='32', es='1', ee='0.02', ed='10000')
 # logging interval
 LOG_INTERVAL = 1_000
 # model parameters saving interval
@@ -44,10 +44,11 @@ if __name__ == '__main__':
     cumulative_reward = 0
     episode_reward = 0
 
-    net = fc([env.observation_space.shape[0], 128, 64, env.action_space.n])
+    net1 = fc([env.observation_space.shape[0], 128, 64, env.action_space.n])
+    net2 = fc([env.observation_space.shape[0], 128, 64, env.action_space.n])
 
-    online_net = DeepQNetworkAgent(env, net)
-    target_net = DeepQNetworkAgent(env, net)
+    online_net = DoubleDeepQNetworkAgent(env, net1)
+    target_net = DoubleDeepQNetworkAgent(env, net2)
 
     target_net.load_state_dict(online_net.state_dict())
 
@@ -88,9 +89,9 @@ if __name__ == '__main__':
             cumulative_reward = 0.05 * episode_reward + 0.95 * cumulative_reward
             episode_reward = 0
 
-        if cumulative_reward > 1000:
+        if cumulative_reward > 500:
             print(f"Solved after {step} steps -> {cumulative_reward}")
-            save_state_dict(online_net, env='breakout-ram', step=str(step), lr='5e-4', bs='32', es='1', ee='0.02',
+            save_state_dict(online_net, env='dqn', v='2', step=str(step), lr='5e-4', bs='32', es='1', ee='0.02',
                             ed='10000')
             break
 
