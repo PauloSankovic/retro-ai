@@ -1,0 +1,7 @@
+agent: a2c
+env: CartPole-v1
+hiperparams:
+  learning_rate: 5e-4
+  discount_rate: 0.99
+  hidden_layers:
+    - 128

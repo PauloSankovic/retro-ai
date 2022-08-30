@@ -1,0 +1,15 @@
+agent: dqn
+env: CartPole-v1
+hiperparams:
+  learning_rate: 4e-4
+  discount_rate: 0.99
+  batch_size: 32
+  buffer_size: 60_000
+  min_replay_size: 1_000
+  epsilon_start: 1.0
+  epsilon_end: 0.02
+  epsilon_decay: 10_000
+  target_update_frequency: 1_000
+  hidden_layers:
+    - 128
+    - 64
