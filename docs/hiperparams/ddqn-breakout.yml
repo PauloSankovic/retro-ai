@@ -1,0 +1,26 @@
+agent: dqn
+env: ALE/Breakout-v5
+hiperparams:
+  learning_rate: 5e-5
+  discount_rate: 0.99
+  batch_size: 32
+  buffer_size: 1_000_000
+  min_replay_size: 50_000
+  epsilon_start: 1.0
+  epsilon_end: 0.1
+  epsilon_decay: 1_000_000
+  target_update_frequency: 2_500
+  num_envs: 4
+  nn_type: cnn
+  cnn_layers:
+    - out_channels: 32
+      kernel_size: 4
+      stride: 2
+    - out_channels: 64
+      kernel_size: 4
+      stride: 2
+    - out_channels: 64
+      kernel_size: 3
+      stride: 1
+  fc_layers:
+    - 512

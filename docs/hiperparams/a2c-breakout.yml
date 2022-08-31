@@ -1,0 +1,19 @@
+agent: a2c
+env: ALE/Breakout-v5
+library: stable-baselines3
+hiperparams:
+  learning_rate: 7e-4
+  num_envs: 4
+  nn_type: cnn
+  cnn_layers:
+    - out_channels: 32
+      kernel_size: 4
+      stride: 2
+    - out_channels: 64
+      kernel_size: 4
+      stride: 2
+    - out_channels: 64
+      kernel_size: 3
+      stride: 1
+  fc_layers:
+    - 512
