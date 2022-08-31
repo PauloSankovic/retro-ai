@@ -135,50 +135,99 @@ Konačno, na kraju epizode provodi se postupak evaluacije prikupljenog znanja \r
     \label{lst:a2c-eval}
 \end{listing}
 
-\section{Okolina CartPole}
+\section{Rezultati agenata CartPole okoline}
 
+Učenje dubokih modela izvršavalo se na grafičkoj kartici \textit{NVIDIA Quadro T1000 with Max-Q Design} uz omogućeno CUDA ubrzanje. Hiperparametri agenata koji su u potpunosti ručno implementirani, navedeni su u dodatku \ref{appendix:cartpole-hiperparams}. Agenti su učeni na okolini \texttt{CartPole-v1} u kojoj je posebnim omotačem specificirano da epizoda može trajati najviše $500$ koraka što je jedan od kriterija zaustavljanja. S druge strane, želimo naučiti agente da budu dugoročno što bolji u okolini. Bez obzira na duljinu epizode, želi se postići da agent što duže u okolini može balansirati štap. Iz tog razloga, prilikom učenja maknuto je ograničenje duljine epizode - na taj način posebno nagrađujemo uspješne dugoročne pokušaje agenta.
 
+\begin{listing}[H]
+    \caption{Izraz za računanje kumulativne nagrade}
+    \inputminted{python}{snippets/cumulative_reward.py}
+    \label{lst:cum-rew}
+\end{listing}
 
-- učenje na grafičkoj xx
-- prikaz grafa i opis (sve na istom grafu)
-- zaključak sa slike
-- korišteni parametri
+Krivulje prikazane na slici \ref{fig:cartpole-cumulative-reward} prikazuju kumulativni iznos nagrada u odnosu na broj iteracija. Kumulativni iznos nagrada računa se prema formuli prikazanoj odsječkom koda \ref{lst:cum-rew}. Kao što je iz grafa vidljivo, \textit{A2C} algoritam daje najbolje rezultate. Potrebno mu je manje vremena za učenje i osim ponekih oscilacija, poprilično je stabilan. Promatrani \textit{A2C} agent koristi relativno veliki iznos stope učenja ($0.03$) i samim time brže konvergira, no i ako smanjimo stopu učenja, algoritam se puno brže uči i njegova krivulja kumulativnog iznosa nagrada je stabilnija. Algoritmi koji se temelje na Q učenju su nestabilniji i zahtijevaju duže vrijeme učenja. Iznos kumulativne nagrade (u kasnijim stadijima učenja kada je parametar $\epsilon$ mali) posebno narušava odabir nasumične akcije zbog koje agent nekada poduzme akcije od kojih se ne može oporaviti. No zapravo, to nam i odgovara. Želimo da se agent nauči snalaziti u nepredvidivim i nepovoljnim situacijama.
 
-\subsection{Implementacija Deep Q Learning algoritma}
+\begin{figure}[H]
+    \centering
+    \frame{\includegraphics[width=9cm]{plots/cartpole-cumulative-reward.png}}
+    \caption{Kumulativna nagrada po broju iteracija okolini CartPole}
+    \label{fig:cartpole-cumulative-reward}
+\end{figure}
 
-\url{https://github.com/PauloSankovic/retro-ai/blob/master/models/DeepQNetworkAgent-state_env\%3Dcartpole_gamma\%3D0.99_lr\%3D5e-4_bs\%3D32_es\%3D1_ee\%3D0.02.pickle}
+\begin{figure}[H]
+    \centering
+    \frame{\includegraphics[width=10cm]{plots/cartpole-cm-stats.png}}
+    \caption{Statistike agenata pri najvećoj vrijednosti kumulativne nagrade CartPole okoline}
+    \label{fig:cartpole-stats}
+\end{figure}
 
-\subsection{Implementacija Double Deep Q Learning algoritma}
+Također, prilikom mnogobrojnog pokretanja funkcije treniranja i opažanja ponašanja agenata, primijeti se da algoritam dvostrukog dubokog Q učenja nije primjetno bolji od njegove osnovne inačice algoritma. Vjerojatno je razlog taj što je riječ o jednostavnijoj okolini s relativno malim brojem dostupnih akcija i moguće je da ne dođe do prevelikog precjenjivanja funkcije akcije. Gledajući graf prosječne vrijednosti funkcije gubitka po broju iteracija \ref{fig:cartpole-loss} vidljivo je da agent dvostrukog dubokog Q učenja ima manji gubitak od svoje osnovne inačice što znači da se u zadanom vremenu bolje prilagodio okolini.
 
-\subsection{Implementacija Actor Critic algoritma}
+\begin{figure}[H]
+    \centering
+    \frame{\includegraphics[width=9cm]{plots/cartpole-loss.png}}
+    \caption{Prosječna vrijednost funkcije gubitka po broju iteracija u okolini CartPole}
+    \label{fig:cartpole-loss}
+\end{figure}
 
-\url{https://github.com/PauloSankovic/retro-ai/blob/master/models/ActorCriticAgent_env\%3Dcarpole_gamma\%3D0.99_lr\%3D3e-2.pickle}
+\section{Rezultati agenata Breakout okoline}
 
-video igranja:
-\url{https://raw.githubusercontent.com/PauloSankovic/retro-ai/master/playground/video/cart-pole/openaigym.video.0.9768.video000000.mp4}
+Učenje dubokih modela također se izvršavalo na grafičkoj kartici \textit{NVIDIA Quadro T1000 with Max-Q Design} uz omogućeno CUDA ubrzanje. Hiperparametri agenata navedeni su u dodatku \ref{appendix:breakout-hipperparams}. Učenje se provodilo na okolini \texttt{ALE/Breakout-v5}. Okolina je umotana u omotače koji pretvaraju RGB vrijednosti piksela u nijanse sive boje, skaliraju sliku na dimenziju $84 \times 84$, ograničavaju nagradu okoline na vrijednosti $\{-1, 0, 1\}$, provode stohastičke tehnike \textit{initial no_ops} i \textit{frame skipping}, te provode istovremeno treniranje nekoliko instanci okoline.
 
-\subsection{Usporedba}
+Agenti dubokog Q učenja i dvostrukog dubokog Q učenja su u potpunosti ručno implementirani, dok je za učenje prednosnog akter-kritičar agenta korištena biblioteka \textit{Stable Baselines3}. Zbog različitih implementacijskih detalja nije moguće napraviti direktnu usporedbu iznosa kumulativnih nagrada tijekom treniranja. 
 
-\section{Okolina Breakout}
+Za razliku od okoline CartPole gdje dvostruko duboko Q učenje i njegova osnovna inačica nisu imali značajnijih odstupanja u postupku treniranja, okolina Breakout pokazala je korisnost i svrhu algoritma dvostrukog dubokog Q učenja. Upravo to prikazuju i grafovi \ref{fig:breakout-avg-ep-len} i \ref{fig:breakout-avg-rew}.
 
-\subsection{Implementacija Double Deep Q Learning algoritma}
+\begin{figure}[H]
+    \centering
+    \frame{\includegraphics[width=9cm]{plots/breakout-avg-ep-len.png}}
+    \caption{Prosječna duljina života agenta po epizodi u okolini Breakout}
+    \label{fig:breakout-avg-ep-len}
+\end{figure}
 
-\url{https://github.com/PauloSankovic/retro-ai/blob/master/models/DoubleDeepQNetworkAgent-state_env\%3Dbreakout_step\%3D1400000_v\%3D2.pickle}
+\begin{figure}[H]
+    \centering
+    \frame{\includegraphics[width=9cm]{plots/breakout-avg-rew.png}}
+    \caption{Prosječna vrijednost skalirane nagrade po epizodi u okolini Breakout}
+    \label{fig:breakout-avg-rew}
+\end{figure}
 
-video igranja:
-\url{https://github.com/PauloSankovic/retro-ai/tree/master/playground/video/breakout-ddqn}
+\begin{figure}[H]
+    \centering
+    \frame{\includegraphics[width=10cm]{plots/breakout-stats.png}}
+    \caption{Statistike agenata pri najvećoj vrijednosti nagrade Breakout okoline}
+    \label{fig:breakout-stats}
+\end{figure}
 
-\subsection{Implementacija Deep Q Learning algoritma}
+Agent algoritma prednosnog akter-kritičara naučen je koristeći biblioteku \textit{Stable Baselines3} koja je opisana u poglavlju \ref{chap:sb3}. Sama okolina omotana je gotovim omotačima koristeći pomoćnu funkciju \texttt{make_atari_env}. Implementacija biblioteke razlikuje se od prethodno opisane ručne implementacije i zbog toga performanse učenja nije moguće direktno usporediti. Informacije o prosječnoj vrijednosti duljine epizode po epizodi i prosječnoj vrijednosti nagrade po epizodi prikazane su na grafovima \ref{fig:breakout-a2c-ep-len-mean} i \ref{fig:breakout-a2c-ep-rew-mean}.
 
-\url{https://github.com/PauloSankovic/retro-ai/blob/master/models/DeepQNetworkAgent-state_env\%3Dbreakout_step\%3D1080000.pickle}
+\begin{figure}[H]
+    \centering
+    \frame{\includegraphics[width=9cm]{plots/breakout-a2c-ep-len-mean.png}}
+    \caption{Prosječna vrijednost duljine epizode po epizodi algoritma \textit{A2C} u okolini Breakout}
+    \label{fig:breakout-a2c-ep-len-mean}
+\end{figure}
 
-\subsection{Implementacija Actor Critic algoritma}
+\begin{figure}[H]
+    \centering
+    \frame{\includegraphics[width=9cm]{plots/breakout-a2c-ep-rew-mean.png}}
+    \caption{Prosječna vrijednost nagrade po epizodi algoritma \textit{A2C} u okolini Breakout}
+    \label{fig:breakout-a2c-ep-rew-mean}
+\end{figure}
 
-Intuitively, expected return simply implies that rewards now are better than rewards later. In a mathematical sense, it is to ensure that the sum of the rewards converges.
+Naučene agente možemo direktno usporediti evaluacijom tako da bilježimo i računamo prosječnu vrijednost trajanja epizode i rezultata kojeg je agent dobio na kraju cjelokupne epizode. Navedene vrijednosti su prikazane u tablici \ref{table:breakout-eval}. Agent \textit{DDQN} ponovno pokazuje izrazito bolje rezultate od \textit{DQN} kojemu se u rijetkim slučajevima zna dogoditi da u cijeloj epizodi ne poduzme nikakvu akciju. Najbolji agent je definitivno \textit{DDQN} s poprilično impresivnim rezultatom. Snalazi se čak i u situacijama kada se brzina kuglice (prilikom razbijanja krajnjih gornjih blokova) primjetno poveća.
 
-To stabilize training, the resulting sequence of returns is also standardized (i.e. to have zero mean and unit standard deviation).
-
-\subsection{Usporedba}
-
-\section{Usporedba algoritama}
-
+\begin{table}[H]
+    \centering
+    \caption{Evaluacija agenata Breakout okoline}
+    \begin{tabular}{c c c}
+        \toprule
+        Algoritam & Iteracija po epizodi & Rezultat po epizodi  \\
+        \midrule
+        DQN & $81.25 \pm 13.311$ & $5.87 \pm 1.452$ \\
+        DDQN & $385.5 \pm 29.004$ & $80.75 \pm 8.584$ \\
+        A2C & $277.57 \pm 63.716$ & $47.92 \pm 16.024$ \\
+        \bottomrule
+    \end{tabular}
+    \label{table:breakout-eval}
+\end{table}
