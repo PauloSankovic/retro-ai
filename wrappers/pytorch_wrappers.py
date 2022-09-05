@@ -11,10 +11,10 @@ from wrappers.wrappers import TimeLimit
 
 def make_atari_deepmind(env_id, max_episode_steps=None, scale_values=False, clip_rewards=True, **kwargs):
     env = gym.make(env_id, **kwargs)
-    env = NoopResetEnv(env, noop_max=1)
+    # env = NoopResetEnv(env, noop_max=1)
 
-    if 'NoFrameskip' in env.spec.id:
-        env = MaxAndSkipEnv(env, skip=4)
+    # if 'NoFrameskip' in env.spec.id:
+        # env = MaxAndSkipEnv(env, skip=4)
 
     if max_episode_steps is not None:
         env = TimeLimit(env, max_episode_steps=max_episode_steps)
