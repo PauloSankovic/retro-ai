@@ -18,7 +18,7 @@ Modul \texttt{networks} sastoji se od metoda i struktura koje omogućuju generi�
     \label{lst:custom-fc}
 \end{listing}
 
-S druge strane, pri instanciranju konvolucijske neuronske mreže, za definiranje atributa konvolucijskog sloja koristi se posebna struktura \texttt{CnnStructure} \ref{lst:cnn-structures} koja definira broj ulaznih i izlaznih kanala, dimenziju jezgre (slobodnih parametara koje učimo), veličinu koraka i nadopunu. Nakon konvolucijskog sloja provodi se nelinearnost aktivacijskom funkcijom ReLU. Na posljetku, značajke se transformiraju u vektor i prosljeđuju potpuno povezanom sloju. Pri prijelazu iz konvolucijskog sloja u potpuno povezani sloj, potrebno je točno izračunati broj parametara koji se prenose iz jednog sloja u drugi. Umjesto iscrpnog računanja, broj parametara je određen tako da se napravio jedan unaprijedni prolaz kroz definirane konvolucijske slojeve. Generični poziv funkcije za instanciranje konvolucijske neuronske mreže prikazan je odsječkom \ref{lst:custom-cnn}. 
+S druge strane, pri instanciranju konvolucijske neuronske mreže, za definiranje atributa konvolucijskog sloja koristi se posebna struktura \texttt{CnnStructure} \ref{lst:cnn-structures} koja definira broj ulaznih i izlaznih kanala, dimenziju jezgre (slobodnih parametara koje učimo), veličinu koraka i nadopunu. Nakon konvolucijskog sloja provodi se nelinearnost aktivacijskom funkcijom ReLU. Na posljetku značajke se transformiraju u vektor i prosljeđuju potpuno povezanom sloju. Pri prijelazu iz konvolucijskog sloja u potpuno povezani sloj, potrebno je točno izračunati broj parametara koji se prenose iz jednog sloja u drugi. Umjesto iscrpnog računanja, broj parametara je određen tako da se napravio jedan unaprijedni prolaz kroz definirane konvolucijske slojeve. Generični poziv funkcije za instanciranje konvolucijske neuronske mreže prikazan je odsječkom \ref{lst:custom-cnn}. 
 
 \begin{listing}[H]
     \caption{Struktura za definiranje atributa konvolucijskog sloja}
@@ -154,12 +154,22 @@ Krivulje prikazane na slici \ref{fig:cartpole-cumulative-reward} prikazuju kumul
     \label{fig:cartpole-cumulative-reward}
 \end{figure}
 
-\begin{figure}[H]
+Kao jednu od mjera kompleksnosti algoritma možemo promatrati i informaciju koliko je vremena bilo potrebno da agent dostigne najveću vrijednost kumulativne nagrade prikazanu na grafu \ref{fig:cartpole-cumulative-reward}. Navedene vrijednosti opisane su u tablici \ref{table:cartpole-stats}.
+
+\begin{table}[H]
     \centering
-    \frame{\includegraphics[width=10cm]{plots/cartpole-cm-stats.png}}
     \caption{Statistike agenata pri najvećoj vrijednosti kumulativne nagrade CartPole okoline}
-    \label{fig:cartpole-stats}
-\end{figure}
+    \begin{tabular}{c c c c}
+        \toprule
+        Algoritam & Iteracija & Kumulativna nagrada & Vrijeme učenja \\
+        \midrule
+        DQN & $122 000$ & $489.5$ & 4m 50s \\
+        DDQN & $140 000$ & $473$ & 6m 46s \\
+        A2C & $66870$ & $476.2$ & 48s \\
+        \bottomrule
+    \end{tabular}
+    \label{table:cartpole-stats}
+\end{table}
 
 Također, prilikom mnogobrojnog pokretanja funkcije treniranja i opažanja ponašanja agenata, primijeti se da algoritam dvostrukog dubokog Q učenja nije primjetno bolji od njegove osnovne inačice algoritma. Vjerojatno je razlog taj što je riječ o jednostavnijoj okolini s relativno malim brojem dostupnih akcija i moguće je da ne dođe do prevelikog precjenjivanja funkcije akcije. Gledajući graf prosječne vrijednosti funkcije gubitka po broju iteracija \ref{fig:cartpole-loss} vidljivo je da agent dvostrukog dubokog Q učenja ima manji gubitak od svoje osnovne inačice što znači da se u zadanom vremenu bolje prilagodio okolini.
 
@@ -192,12 +202,21 @@ Za razliku od okoline CartPole gdje dvostruko duboko Q učenje i njegova osnovna
     \label{fig:breakout-avg-rew}
 \end{figure}
 
-\begin{figure}[H]
+Kompleksnost i učinkovitost algoritama \textit{DQN} i \textit{DDQN} može se promatrati i kroz informaciju koliko je vremena bilo potrebno da agent dostigne najveću vrijednost kumulativne nagrade prikazanu na grafu \ref{fig:cartpole-cumulative-reward}. Informacija o vremenima učenja prikazana je u tablici \ref{table:breakout-stats}.
+
+\begin{table}[H]
     \centering
-    \frame{\includegraphics[width=10cm]{plots/breakout-stats.png}}
-    \caption{Statistike agenata pri najvećoj vrijednosti nagrade Breakout okoline}
-    \label{fig:breakout-stats}
-\end{figure}
+    \caption{Statistike pri najvećoj vrijednosti prosječne duljine života agenata Breakout okoline}
+    \begin{tabular}{c c c c}
+        \toprule
+        Algoritam & Iteracija & Kumulativna nagrada & Vrijeme učenja \\
+        \midrule
+        DQN & $1086000$ & $59.42$ & 12h 4m 20s \\
+        DDQN & $1401000$ & $178.8$ & 10h 57m 24s \\
+        \bottomrule
+    \end{tabular}
+    \label{table:breakout-stats}
+\end{table}
 
 Agent algoritma prednosnog akter-kritičara naučen je koristeći biblioteku \textit{Stable Baselines3} koja je opisana u poglavlju \ref{chap:sb3}. Sama okolina omotana je gotovim omotačima koristeći pomoćnu funkciju \texttt{make_atari_env}. Implementacija biblioteke razlikuje se od prethodno opisane ručne implementacije i zbog toga performanse učenja nije moguće direktno usporediti. Informacije o prosječnoj vrijednosti duljine epizode po epizodi i prosječnoj vrijednosti nagrade po epizodi prikazane su na grafovima \ref{fig:breakout-a2c-ep-len-mean} i \ref{fig:breakout-a2c-ep-rew-mean}.
 
