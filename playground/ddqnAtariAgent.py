@@ -31,7 +31,7 @@ TARGET_UPDATE_FREQ = 10_000 // NUM_ENVS
 # model parameters saving interval
 SAVE_INTERVAL = 10_000
 # summary writer directory
-LOG_DIR = '../summary/breakout/ddqn-v1'
+LOG_DIR = '../summary/breakout/DDQN'
 # logging interval
 LOG_INTERVAL = 1_000
 
